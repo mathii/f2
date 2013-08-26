@@ -23,7 +23,7 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA){
       dgamma(x, shape=1+1/D, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
     }
     ## This is to ensure that we are not integrating over large zero regions
-    upper=Lg
+    upper=max(0,Lg-1e-6)                #the 1e-6 is because when shape<0 the gamma dist is not defined at x=0
     new.upper=upper
     while(inner(new.upper)==0 & upper>Lg/16){
       upper=new.upper
@@ -92,20 +92,22 @@ make.pnfn <- function(n, t.grid=c((1:10)/10, 2:10)){
 ## logt.grid: grid of values to compute likelihood at
 ## error.params: (shape, rate) for the gamma overestimate in Lg
 ## S.params - data.frame: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
+## verbose: report progress
 ########################################################################################################
 
-compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10,  error.params=NA, S.params=NA){
+compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params=NA, S.params=NA, verbose=FALSE){
   ll.mat <- matrix(0, nrow=length(Lgs), ncol=length(logt.grid))
   
   for(i in 1:length(Lgs)){
     for(j in 1:length(logt.grid)){
-      cat(paste("\r", i, j))
+      if(verbose){cat(paste("\r", i, j))}
       s.p <- NA
       if(!all(is.na(S.params))){s.p <- S.params[i,]}
       ll.mat[i,j] <- loglikelihood.age(t=(10^(logt.grid[j]))/2/Ne, Lg=Lgs[i], D=Ds[i], Ne=Ne, pf=pf,  error.params=error.params, S.params=s.p)
     }
   }
-    return(ll.mat)
+  if(verbose){cat("\n")}
+  return(ll.mat)
 }
 
 ########################################################################################################

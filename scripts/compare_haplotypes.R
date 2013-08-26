@@ -34,7 +34,6 @@ true.haps$hap.left <- NA
 true.haps$hap.right <- NA
 true.haps$f1 <- NA
 true.haps$f2 <- NA
-true.haps$t.hat <- NA
 true.haps$map.len <- NA
 true.haps$f2.hap.id <- NA
 true.haps$Age <- true.haps$Age*Ne*4     #Is this a factor of 2.. ms says it is 4Ne?? 
@@ -49,11 +48,11 @@ for( i in 1:NROW(true.haps)){
       select <- f2.haps[f2.haps$ID1==true.haps[i,"ID1"]&f2.haps$ID2==true.haps[i,"ID2"]&f2.haps$pos>=true.haps[i,"Start"]&f2.haps$pos<=true.haps[i,"End"],]
 
   if(NROW(select)==1){
-    true.haps[i,c("hap.left", "hap.right", "f1", "f2", "t.hat", "map.len", "f2.hap.id")] <- c(select[c("hap.left", "hap.right", "f1", "f2", "t.hat", "map.len" )], as.numeric(rownames(select)[1]))
+    true.haps[i,c("hap.left", "hap.right", "f1", "f2", "map.len", "f2.hap.id")] <- c(select[c("hap.left", "hap.right", "f1", "f2", "map.len" )], as.numeric(rownames(select)[1]))
   }
   if(NROW(select)>1){
     cat("this should never happen - overlapping f2 haplotypes\n")
-    true.haps[i,c("hap.left", "hap.right", "f1", "f2", "t.hat", "map.len", "f2.hap.id")] <- c(select[1,c("hap.left", "hap.right", "f1", "f2", "t.hat",  "map.len")], as.numeric(rownames(select)[1]))
+    true.haps[i,c("hap.left", "hap.right", "f1", "f2", "map.len", "f2.hap.id")] <- c(select[1,c("hap.left", "hap.right", "f1", "f2",  "map.len")], as.numeric(rownames(select)[1]))
   }
 
 }
@@ -61,9 +60,11 @@ for( i in 1:NROW(true.haps)){
 ## augment....
 matched <- true.haps[!is.na(true.haps$f2.hap.id),]
 matched$hap.len <- matched$hap.right-matched$hap.left
-matched <- matched[matched$ID1!=matched$ID2,] #remove haplotypes you matched with yourself
 matched$true.len<-matched$End-matched$Start
 matched$true.f1 <- count.singletons.from.positions(matched[,c("ID1", "ID2")], matched$Start, matched$End, paste(hap.dir, "/pos.idx.f1.gz", sep=""))
+## filter...
+matched <- matched[matched$ID1!=matched$ID2,] #remove haplotypes you matched with yourself
+matched <- matched[matched$true.map>0,]       #remove things with 0 length (shouldn't really happen)
 
 write.table(matched, paste(res.dir, "/matched_haps.txt", sep=""), sep="\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
 

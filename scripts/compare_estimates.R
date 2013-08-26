@@ -12,16 +12,20 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==4){
+if(length(args)==7){
   code.dir <- args[1]
   res.dir <- args[2]
   Ne <- as.numeric(args[3])
   nseq <- as.numeric(args[4])/2
   mu <- as.numeric(args[5])
+  max.log <- as.numeric(args[6])
+  bins <- as.numeric(args[7])
   plots <- TRUE
 } else{
-  stop("Need to specify 4 arguments")
+  stop("Need to specify 7 arguments")
 }
+
+error.params <- c(0.6,350)
 
 ######################################################################################################
 
@@ -52,18 +56,18 @@ cat("Calculating MLE\n")
 for(j in 1:NROW(matched)){
   cat(paste("\r", j))
   ## Using true values
-  t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
-  t.hats[j,4] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,0.5), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA, S.params=S.params.true[j,])$maximum
+  t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,2), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
+  t.hats[j,4] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA, S.params=S.params.true[j,])$maximum
 
   ## Using observed values
-  t.hats[j,2] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA)$maximum
-  t.hats[j,5] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,0.5), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA, S.params=S.params[j,])$maximum
+  t.hats[j,2] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,2), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA)$maximum
+  t.hats[j,5] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA, S.params=S.params[j,])$maximum
 
   ## Obesrved values with corrected likelihood
   max.search <- 100*t.hats[j,2]/2/Ne
   if(log10(t.hats[j,2])<0){max.search <- max.search/50} #ugh
-  t.hats[j,3] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=c(1.2,375))$maximum
-  t.hats[j,6] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=c(1.2,375), S.params=S.params[j,])$maximum
+  t.hats[j,3] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=error.params)$maximum
+  t.hats[j,6] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=error.params, S.params=S.params[j,])$maximum
 }
 cat("\rCalculating ll matrices\n")
 
@@ -71,13 +75,13 @@ norm.2.p <- function(x){return(dnorm(x, mean=2))}
 
 denss <- list()
 ll.mats <- list()
-logt.grid <- (0:40)/10
-ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA)
-ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA)
-ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=c(1.2,375), S.params=NA)
-ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true)
-ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params)
-ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=c(1.2,375), S.params=S.params)
+logt.grid <- seq(0, max.log, length.out=bins)
+ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=TRUE)
+ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=TRUE)
+ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=TRUE)
+ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true, verbose=TRUE)
+ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params, verbose=TRUE)
+ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=TRUE)
 
 cat("Sampling Densities\n")
 if(plots){pdf(paste(res.dir, "/mcmc_densities.pdf", sep=""), height=12, width=18)}else{dev.new()}
@@ -90,11 +94,11 @@ if(plots){dev.off()}
 
 save.image(paste(res.dir, "/ll_and_density_environment.Rdata", sep=""))
 
-labels=c("True (Lg)", "Observed (Lg)", "Corrected (Lg)", "True (Lg+S)", "Observed (Lg+S)", "Corrected (Lg+S)", "Corrected, Full (Lg+S)")
-if(plots){pdf(paste(results.dir, "/compare_estimates.pdf", sep=""), height=12, width=18)}else{dev.new()}
-par(mfrow=c(3,3))
+labels=c("True (Lg)", "Observed (Lg)", "Corrected (Lg)", "True (Lg+S)", "Observed (Lg+S)", "Corrected (Lg+S)")
+if(plots){pdf(paste(res.dir, "/compare_estimates.pdf", sep=""), height=12, width=18)}else{dev.new()}
+par(mfrow=c(2,3))
 for(i in 1:6){
-  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i])
+  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log))
 }
 if(plots){dev.off()}
 

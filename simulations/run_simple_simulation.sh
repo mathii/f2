@@ -8,19 +8,22 @@
 
 ##############################################################################################################
 
-# where is macs
+# Edit simulation parameters here. 
+
+# where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=~/f2_age/simulations/constant_chr20
 # Where is the recombination map, in impute format?
-HM2_MAP=~/1000genomes/hm2_recombination_map/constant_map.txt.gz
-# Where is the root of the code directory
+HM2_MAP=~/f2_age/code/test/constant_map.txt.gz
+HM2_MAP=~/1000genomes/hm2_recombination_map/genetic_map_GRCh37_chr20.txt.gz
+# Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2_age/code
 
 # Parameters: size of region,number of hapotypes, Ne, estimated power 
-nbp=1000000
+nbp=62000000
 nhp=100
-ne=10000
+ne=14000
 dbp=0.66
 mu=0.000000012
 
@@ -41,12 +44,13 @@ done
 
 # compound params
 theta=`echo "4*$ne*$mu" | bc`
+rho=`echo "4*$ne*0.00000001" | bc`
 
 # 1) convert to hms map to macs format
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # 2) Simulate using macs 
-${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r 4e-4 -h 1e3 -R ${MD}/map.txt 2> \
+${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
     ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -c > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 
 # 3)Parse the macs output to get trees and genotypes
@@ -57,7 +61,7 @@ zgrep "^\[" ${WD}/haplotypes.txt.gz | sed -e 's/\[[^][]*\]//g' | gzip -c > ${WD}
 zgrep -o '\[[0-9]*\]' ${WD}/haplotypes.txt.gz | sed 's/\[//g;s/\]//g' | gzip -c > ${WD}/trees.lengths.txt.gz
 # # Get tree pos positions
 # Get genotypes ans positions. 
-zcat ${WD}/haplotypes.txt.gz | tail -n ${nhp} | gzip -c > ${WD}/genotypes.txt.gz
+gunzip -c ${WD}/haplotypes.txt.gz | tail -n ${nhp} | gzip -c > ${WD}/genotypes.txt.gz
 zgrep "positions" ${WD}/haplotypes.txt.gz | cut -d " " -f2- | gzip -c > ${WD}/snps.pos.txt.gz 
 # Parse the genotype data into the right format, by haplotypes etc... 
 python ${CD}/scripts/macs_genotype_to_hap_files.py -g ${WD}/genotypes.txt.gz \
@@ -73,7 +77,7 @@ python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/haps.f2.gz -o ${TH}/pos.idx.
 python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/haps.gz  -o ${TH}/by_sample/ -s ${TH}/samples.txt
 
 # 6) Estimate haplotypes from f2
-R --vanilla --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt < ${CD}/scripts/haplotypes_from_f2.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt < ${CD}/scripts/haplotypes_from_f2.R
 gzip ${RD}/f2_haplotypes.txt 
 
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
