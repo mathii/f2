@@ -25,12 +25,11 @@ if(length(args)==7){
   stop("Need to specify 7 arguments")
 }
 
-error.params <- c(0.6,350)
-
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
 matched <- read.table(paste(res.dir, "/matched_haps.txt.gz", sep=""), as.is=TRUE, header=TRUE)
+error.params <- scan(paste(res.dir, "error_params.txt", sep="/"), quiet=TRUE)
 
 ######################################################################################################
 
@@ -38,7 +37,7 @@ cat("Calculating pn(t)\n")
 if(!("p.fun" %in% ls())){
   p.fun <- make.pnfn(2*nseq)
 }
-
+                    
 ## Set up singleton params
 t.hats <- matrix(0, nrow=NROW(matched), ncol=6)
 S.params <- matched[,c("f1", "hap.len")]
@@ -56,12 +55,13 @@ cat("Calculating MLE\n")
 for(j in 1:NROW(matched)){
   cat(paste("\r", j))
   ## Using true values
-  t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,2), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
-  t.hats[j,4] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA, S.params=S.params.true[j,])$maximum
+  max.search <- (10^max.log)/2/Ne
+  t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
+  t.hats[j,4] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA, S.params=S.params.true[j,])$maximum
 
   ## Using observed values
-  t.hats[j,2] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,2), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA)$maximum
-  t.hats[j,5] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,1), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA, S.params=S.params[j,])$maximum
+  t.hats[j,2] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA)$maximum
+  t.hats[j,5] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$map.len[j],  Ne=Ne, pf=p.fun,  D=matched$f2[j], error.params=NA, S.params=S.params[j,])$maximum
 
   ## Obesrved values with corrected likelihood
   max.search <- 100*t.hats[j,2]/2/Ne

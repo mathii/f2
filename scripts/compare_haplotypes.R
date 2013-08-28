@@ -71,6 +71,23 @@ write.table(matched, paste(res.dir, "/matched_haps.txt", sep=""), sep="\t", row.
 ## what would happen if we didn't see all doubletons
 pwr.matched <- matched[rbinom(NROW(matched), size=matched$f2, prob=dbl.pwr)>0,]
 
+
+## Plot lengths
+elements.Lg=list("All"=log10(true.haps$true.map/100), "Detected"=log10(matched$true.map/100), "60% power"=log10(pwr.matched$true.map/100) )
+elements.Lp=list("All"=log10(true.haps$End-true.haps$Start), "Detected"=log10(matched$End-matched$Start), "60% power"=log10(pwr.matched$End-pwr.matched$Start) )
+blues=c("#377EBA40", "#377EBA80", "#377EBAB0")
+border.blues=c("#377EBA", "#377EBA", "#377EBA")
+reds=c("#E41A1C40", "#E41A1C80", "#E41A1CB0")
+border.reds=c("#E41A1C", "#E41A1C", "#E41A1C")
+if(plots){pdf(paste(res.dir, "/distribution_genetic_length.pdf", sep=""))}else{dev.new()}
+overlapping.density.plot(elements.Lg, cols=reds, borders=border.reds, xlab=expression(Log[10]~"(Length (M))"), main="Genetic length")
+if(plots){dev.off()}
+if(plots){pdf(paste(res.dir, "/distribution_physical_length.pdf", sep=""))}else{dev.new()}
+overlapping.density.plot(elements.Lp, cols=blues, borders=border.blues, xlab=expression(Log[10]~"(Length (b))"), main="Physical length")
+if(plots){dev.off()}
+
+
+## Plot power 
 all.map.hist <- hist(log10(true.haps$true.map), plot=FALSE, breaks=40)
 match.map.hist <- hist(log10(matched$true.map), plot=FALSE, breaks=all.map.hist$breaks)
 pwr.match.map.hist <- hist(log10(pwr.matched$true.map), plot=FALSE, breaks=all.map.hist$breaks)
@@ -79,34 +96,21 @@ all.hist <- hist(log10(true.haps$End-true.haps$Start), plot=FALSE, breaks=40)
 match.hist <- hist(log10(matched$End-matched$Start), plot=FALSE, breaks=all.hist$breaks)
 pwr.match.hist <- hist(log10(pwr.matched$End-pwr.matched$Start), plot=FALSE, breaks=all.hist$breaks)
 
-if(plots){pdf(paste(res.dir, "/length_distribution.pdf", sep=""))}else{dev.new()}
-## compute histogram to show power.
-this.power <- length(unique(matched$f2.hap.id))/NROW(true.haps)
-this.pwr.power <- length(unique(pwr.matched$f2.hap.id))/NROW(true.haps)
-plot(all.hist$mids, all.hist$density, col="#377EBA", type="l", bty="n", xlab=expression(Log[10]~"(Length (b))"), ylab="Density", xaxt="n")
-axis(1,at=c(1:8))
-polygon(c(1,all.hist$mids,8), c(0,all.hist$density,0), col="#377EBA40", border="#377EBA" )
-polygon(c(1,match.hist$mids,8), c(0,match.hist$density*this.power,0), col="#377EBA80", border="#377EBA")
-polygon(c(1,pwr.match.hist$mids,8), c(0,pwr.match.hist$density*this.pwr.power,0), col="#377EBAB0", border="#377EBA")
-if(plots){dev.off()}
-
 ## and power
 x <- log10(matched$End - matched$Start)
-y <- log10(matched$true.map)
-lims <- predict(lm(x~y), data.frame(y=c(-2.5,1)))
+y <- log10(matched$true.map/100)
+Lg.lim <- c(-5,0)
+Lp.lim <- predict(lm(x~y), data.frame(y=Lg.lim))
 
 if(plots){pdf(paste(res.dir, "/power.pdf", sep=""))}else{dev.new()}
 par(list(mfrow=c(2,1), mar=c(3.8,4.1,4.1,2.1)))
-plot(all.hist$mids ,match.hist$count/all.hist$count, col="#377EBA80", lwd=2, bty="n", type="l", pch=16, xlab=expression(Log[10]~"(Length (b))"), ylab="Power", xlim=lims, xaxt="n", yaxt="n")
-lines(all.hist$mids ,pwr.match.hist$count/all.hist$count, col="#377EBAB0", lwd=2, bty="n", type="l", pch=16)
+overlapping.power.plot(elements.Lp, cols=c( "#377EBA", "#377EBA80"), xlab=expression(Log[10]~"(Length (b))"), xlim=Lp.lim, xaxt="n", yaxt="n", ylab="Power")
 axis(1, at=seq(2,7,0.5), line=-0.3)
 axis(2, at=c(0,0.5,1))
 ## Power as a function of genetic length
-
 par(list(mar=c(5.1,4.1,2.8,2.1)))
-plot(all.map.hist$mids ,match.map.hist$count/all.map.hist$count, col="#E41A1C80", lwd=2, bty="n", type="l", pch=16, xlab=expression(Log[10]~"(Length (cM))"), ylab="Power", xlim=c(-2.5,1), xaxt="n", yaxt="n")
-lines(all.map.hist$mids ,pwr.match.map.hist$count/all.map.hist$count, col="#E41A1CB0", lwd=2, bty="n", type="l", pch=16)
-axis(1, at=seq(-3,1.5,0.5), line=-0.3)
+overlapping.power.plot(elements.Lg, cols=c( "#E41A1C", "#E41A1C80"), xlab=expression(Log[10]~"(Length (M))"), xlim=Lg.lim, xaxt="n", yaxt="n", ylab="Power")
+axis(1, at=seq(-6,1,1), line=-0.3)
 axis(2, at=c(0,0.5,1))
-dev.off()
+if(plots){dev.off()}
 

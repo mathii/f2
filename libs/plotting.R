@@ -60,3 +60,57 @@ plot.mle.and.density <- function(true.age, t.hat, dens, ...){
 }
 
 ############################################################################################################################
+## Density plot, with different densities overlapping in different colours.
+## Scales the densities so that they are proportional to the first
+## item of elements. 
+## elements: list of vectors of objects, names taken from name of list
+## cols: colours to plot
+## borders: border colours
+
+overlapping.density.plot <- function(elements, cols, borders, main="", xlab="", legend.pos="topleft", ...){
+  n <- length(elements)
+  denss <- list()
+  for(i in 1:length(elements)){
+    denss[[i]] <- density(elements[[i]])
+  }
+
+  plot(denss[[1]], col=borders[1], type="l", bty="n", main=main, xlab=xlab, ...)
+  for(i in 1:n){
+    scale <- length(elements[[i]])/length(elements[[1]])
+    polygon(denss[[i]]$x, scale*denss[[i]]$y, col=cols[i], border=borders[i] )
+  }
+
+  if(!all(is.null(names(elements)))){
+    legend(legend.pos, names(elements), fill=cols, border=borders, bty="n")
+  }
+}
+
+############################################################################################################################
+## Simillar to the overlapping density plot, but plots the scale factor
+## as a function of the element value. elements has to be longer than 2, then
+## elements: list of vectors of objects, names taken from name of list
+## cols: colours to plot
+## borders: border colours
+
+overlapping.power.plot <- function(elements, cols, main="", xlab="", legend.pos="topleft", lwd=2, lty=1, ...){
+  n <- length(elements)
+  denss <- list()
+  for(i in 1:length(elements)){
+    denss[[i]] <- density(elements[[i]])
+  }
+
+  for(i in 2:n){
+    scale <- length(elements[[i]])/length(elements[[1]])
+    dfn <- approxfun(denss[[i]]$x, scale*denss[[i]]$y, rule=2)
+    power <- pmin(denss[[1]]$y, dfn(denss[[i]]$x)) #in case we go over 1 when the sample is small
+    if(i==2){
+      plot(denss[[1]]$x, power/denss[[1]]$y, col=cols[1], main=main, xlab=xlab, bty="n", lwd=lwd, lty=lty, type="l", ...)
+    }else{
+      lines(denss[[1]]$x, power/denss[[1]]$y, col=cols[i-1], main=main, xlab=xlab, bty="n", lwd=lwd, lty=lty)
+    }
+  }
+  
+  if(!all(is.null(names(elements)))){
+    legend(legend.pos, names(elements)[2:n], col=cols, lwd=lwd, lty=lty, bty="n")
+  }
+}

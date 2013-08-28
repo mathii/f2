@@ -148,7 +148,11 @@ estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:600)/100, verb
   for(sim in 1:total.sims){
     cat(paste("\rIteration", sim))
     for(i in 1:n){
-      ti[i] <- sample(1:k, size=1, prob=probs*f.mat[i,])
+      pr=probs*f.mat[i,]
+      if(all(f.mat[i,]==0)){
+        pr=probs
+      }
+      ti[i] <- sample(1:k, size=1, prob=pr)
     }
     counts <- tabulate(ti, nbins=k)
     probs <- counts/(alpha+n)+alpha*prior.probs/(alpha+n)

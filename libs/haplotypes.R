@@ -110,10 +110,15 @@ find.inconsistent.hom <- function(gt1, gt2, gt.pos, pos, len=length(gt1)){
   idx.r <- idx.l+1
   if(gt.pos[idx.l]==pos){idx.r <- idx.l}
 
-  incon <- (gt1==2&gt2==0)|(gt1==0&gt2==2)
-  left <- max(1,which(TRUE==incon[1:idx.l]))
-  right <- min(len,idx.r-1+which(TRUE==incon[idx.r:len]))
-  return(c(left,right))
+  idx.l <- max(1,idx.l-1)
+  while(idx.l>1 & abs(gt1[idx.l]-gt2[idx.l])<2){
+    idx.l <- idx.l-1
+  }
+  idx.r <- min(len, idx.r+1) 
+  while(idx.r<len & abs(gt1[idx.r]-gt2[idx.r])<2){
+    idx.r <- idx.r+1
+  }
+  return(c(idx.l, idx.r))
 }
 
 ########################################################################################################
@@ -140,9 +145,9 @@ load.fn <- function(fn.file){
 ## if it's a file, load the map.
 ########################################################################################################
 
-get.mapfn <- function(map){
+get.mapfn <- function(map.file){
   mapfn <- NULL
-  if(!is.numeric(map)){
+  if(!is.numeric(map.file)){
     map <- read.table(map.file, as.is=TRUE, header=TRUE)
     mapfn <- approxfun(map[,2], map[,4], rule=2, method="linear")
   } else{
@@ -151,3 +156,50 @@ get.mapfn <- function(map){
   }
   return(mapfn)
 }
+
+########################################################################################################
+## From a set of sample genotypes, sample pairs at random, then sample points at
+## random, then get the left and right distance to the nearest incompatible hom
+## and finally, fit a gamma distribution to the distribution of total distances.
+## path.to.samples: path to genotype files
+## samples: file list of sample names
+## map.file: genetic map
+## pairs, each: sample each points from pairs sets of individuals
+## verbose: report progress
+########################################################################################################
+
+fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, each=1000, verbose=FALSE){
+  LOWER.BOUND <- 1e-6                   #just to help with optimization
+  pos <- scan(paste(path.to.samples, "/pos.gz", sep=""), quiet=TRUE)
+  map <- get.mapfn(map.file)
+  n <- length(samples)
+  l <- length(pos) 
+  p1 <- sort(sample(n, size=pairs, replace=TRUE))
+  p2 <- sample(n, size=pairs, replace=TRUE)
+
+  results.l <- rep(0, pairs*each)
+  results.r <- rep(0, pairs*each)
+
+  if(verbose){cat("Estimating length overestimate parameters\n")}
+  for(i in 1:pairs){
+    while(p2[i]==p1[i]){p2[i] <- sample(n, size=1)} #just in case we accidentally picked the same person. 
+    if(verbose){cat(paste("\r", i, "/", pairs, sep="" ))}
+    gt1 <- scan(paste( path.to.samples, "/", samples[p1[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
+    gt2 <- scan(paste( path.to.samples, "/", samples[p2[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
+    
+    for(j in 1:each){
+      x <- sample(min(pos):max(pos), size=1)
+      pts <- find.inconsistent.hom(gt1, gt2, pos, x, l)
+      ps <- pos[pts]
+      results.l[pairs*(i-1)+j] <- map(x)-map(ps[1])
+      results.r[pairs*(i-1)+j] <- map(ps[2])-map(x)
+    }
+  }
+  if(verbose){cat("\n")}
+  results <- ifelse(runif(pairs*each)<0.5, results.l, results.r) #r and l are correlated, so we want one sided only. 
+  fit <- fitdistr(results[results>0], "gamma", lower=rep(LOWER.BOUND, 2))
+  error.params <- fit$estimate
+  error.params[1] <- error.params[1]*2  #double shape parameter since the overestimate is on both sides
+  return(error.params)
+}
+
