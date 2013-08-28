@@ -22,17 +22,17 @@ declare -a CHR_LENGTHS=(-1 249250621 243199373 198022430 191154276 180915260 171
 
 ##############################################################################################################
 
-mkdir -p SIMS_ROOT
+mkdir -p ${SIMS_ROOT}
 
-rm -f SIMS_ROOT/tmp_args
+rm -f ${SIMS_ROOT}/tmp_args
 for CHR in {1..22}
 do
-    echo "$CODE_DIR/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]}" >> SIMS_ROOT/tmp_args
+    echo "$CODE_DIR/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
 done
 
-xargs --arg-file=SIMS_ROOT/tmp_args --max-procs=N_PROCS --replace --verbose /bin/sh -c "{}"
-rm SIMS_ROOT/tmp_args
+# xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=N_PROCS --replace --verbose /bin/sh -c "{}"
+# rm ${SIMS_ROOT}/tmp_args
 
-# Now run files to combine results
-mkdir -p SIMS_ROOT/all
+# # Now run files to combine results
+# mkdir -p ${SIMS_ROOT}/all
 

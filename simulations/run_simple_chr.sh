@@ -17,14 +17,14 @@ nbp=$2
 # where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/simulations/ns/n1000_chr${CHR}
+SIMS_DIR=~/f2/simulations/simple/chr${CHR}
 # Where is the recombination map, in impute format?
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp=2000
+nhp=200
 ne=14000
 dbp=0.66
 mu=0.000000012
@@ -45,7 +45,7 @@ done
 
 # redirect output to logfile 
 LOG=${RD}/log.txt
-# exec > ${LOG} 2>&1
+exec > ${LOG} 2>&1
 
 # compound params
 theta=`echo "4*$ne*$mu" | bc`

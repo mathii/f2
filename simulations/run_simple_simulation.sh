@@ -15,12 +15,12 @@ MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=~/f2/simulations/test
 # Where is the recombination map, in impute format?
-HM2_MAP=~/f2/code/test/constant_map.txt.gz
+HM2_MAP=~/f2/f2_age/test/constant_map.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
 # Parameters: size of region,number of hapotypes, Ne, estimated power 
-nbp=10000000
+nbp=1000000
 nhp=100
 ne=10000
 dbp=0.66
