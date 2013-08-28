@@ -1,12 +1,11 @@
 #!/bin/bash -vx
 
-#This is the same as run_simple_simulation.sh, except it takes an argument for which chromosome you want 
-# to run on and the lengt. so see the comments for that file and run this like ./run_simple_chr.sh 22 60e6 etc... 
-# Then, to run on all chromosomes, edit the entries below to point where you want, and run run_simple_all.sh
-# which will run this for chrs 1...22 and then run some additional scripts to consolidate the results. 
+#This is the same as run_simple_chr.sh, except it runs a more complex simulation with a population split
+# followed by expansion, and then runs an additional script to analyse the difference between the two populations. 
+
 
 ##############################################################################################################
-# Script arguments
+# script arguments
 CHR=$1
 nbp=$2
 
@@ -17,15 +16,16 @@ nbp=$2
 # where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/simulations/ns/n1000_chr${CHR}
+SIMS_DIR=~/f2/simulations/simple/chr${CHR}
 # Where is the recombination map, in impute format?
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp=2000
-ne=14000
+nhp1=200
+nhp2=200
+ne=10000
 dbp=0.66
 mu=0.000000012
 
@@ -50,12 +50,13 @@ LOG=${RD}/log.txt
 # compound params
 theta=`echo "4*$ne*$mu" | bc`
 rho=`echo "4*$ne*0.00000001" | bc`
+nhp=`echo "$nhp1+$nhp2" | bc`
 
 # 1) convert hms map to macs format
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # 2) Simulate using macs 
-${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
+${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.1 2 1 -T 2> \
     ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 
 # 3)Parse the macs output to get trees and genotypes
