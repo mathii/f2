@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-import gzip, sys, getopt, pdb
+import gzip, sys, getopt
 
 ##########################################################################################################
 
@@ -43,9 +43,11 @@ def main(options):
     pos=np.floor(pos*options["chr_len"]).astype(int)
     
     gt=gt.transpose().astype(int)
-
+    # This is because on some platforms the np.genfromtxt tries to import the line endings...     
+    gt=gt[range(len(pos)),]               
+    
     (nsnp,nind)=gt.shape
-    pdb.set_trace()
+
     ACs=np.sum(gt, axis=1)
     MACs=np.minimum(ACs, nind-ACs)
     for i in range(nsnp):
