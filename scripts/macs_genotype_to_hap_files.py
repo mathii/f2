@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-import gzip, sys, getopt
+import gzip, sys, getopt, pdb
 
 ##########################################################################################################
 
@@ -45,7 +45,7 @@ def main(options):
     gt=gt.transpose().astype(int)
 
     (nsnp,nind)=gt.shape
-
+    pdb.set_trace()
     ACs=np.sum(gt, axis=1)
     MACs=np.minimum(ACs, nind-ACs)
     for i in range(nsnp):
