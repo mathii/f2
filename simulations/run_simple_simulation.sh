@@ -53,15 +53,15 @@ ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 
     ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -c > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 
 # 3)Parse the macs output to get trees and genotypes
-gzip ${WD}/trees.txt
+gzip -f ${WD}/trees.txt
 # extract trees and cut out the inital first brackets so that we can use the biopython parser. 
-zgrep "^\[" ${WD}/haplotypes.txt.gz | sed -e 's/\[[^][]*\]//g' | gzip -c > ${WD}/trees.newick.txt.gz
+zgrep "^\[" ${WD}/haplotypes.txt.gz | sed -e 's/\[[^][]*\]//g' | gzip -cf > ${WD}/trees.newick.txt.gz
 # also store tract lengths - use these to recover positions. 
-zgrep -o '\[[0-9]*\]' ${WD}/haplotypes.txt.gz | sed 's/\[//g;s/\]//g' | gzip -c > ${WD}/trees.lengths.txt.gz
+zgrep -o '\[[0-9]*\]' ${WD}/haplotypes.txt.gz | sed 's/\[//g;s/\]//g' | gzip -cf > ${WD}/trees.lengths.txt.gz
 # # Get tree pos positions
 # Get genotypes ans positions. 
-gunzip -c ${WD}/haplotypes.txt.gz | tail -n ${nhp} | gzip -c > ${WD}/genotypes.txt.gz
-zgrep "positions" ${WD}/haplotypes.txt.gz | cut -d " " -f2- | gzip -c > ${WD}/snps.pos.txt.gz 
+gunzip -c ${WD}/haplotypes.txt.gz | tail -n ${nhp} | gzip -cf > ${WD}/genotypes.txt.gz
+zgrep "positions" ${WD}/haplotypes.txt.gz | cut -d " " -f2- | gzip -cf > ${WD}/snps.pos.txt.gz 
 # Parse the genotype data into the right format, by haplotypes etc... 
 python ${CD}/scripts/macs_genotype_to_hap_files.py -g ${WD}/genotypes.txt.gz \
  -p ${WD}/snps.pos.txt.gz -l ${nbp} -o ${TH}
@@ -77,7 +77,7 @@ python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/haps.gz  -o ${TH}/by_sample
 
 # 6) Estimate haplotypes from f2 variants
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt < ${CD}/scripts/haplotypes_from_f2.R
-gzip ${RD}/f2_haplotypes.txt 
+gzip -f ${RD}/f2_haplotypes.txt 
 
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R

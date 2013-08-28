@@ -200,6 +200,7 @@ fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, e
   fit <- fitdistr(results[results>0], "gamma", lower=rep(LOWER.BOUND, 2))
   error.params <- fit$estimate
   error.params[1] <- error.params[1]*2  #double shape parameter since the overestimate is on both sides
+  error.params[2] <- error.params[2]*100  #convert to Morgans
   return(error.params)
 }
 
