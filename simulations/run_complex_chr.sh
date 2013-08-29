@@ -16,7 +16,7 @@ nbp=$2
 # where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/simulations/simple/chr${CHR}
+SIMS_DIR=~/f2/simulations/complex/chr${CHR}
 # Where is the recombination map, in impute format?
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github

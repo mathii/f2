@@ -24,7 +24,7 @@ HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp=200
+nhp=100
 ne=14000
 dbp=0.66
 mu=0.000000012
@@ -82,6 +82,7 @@ python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/haps.f2.gz -o ${TH}/pos.idx.
 python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/haps.gz  -o ${TH}/by_sample/ -s ${TH}/samples.txt
 
 # 6) Estimate haplotypes from f2 variants
+sleep 2				# wait for file to sync, perhaps
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt 0 < ${CD}/scripts/haplotypes_from_f2.R
 gzip -f ${RD}/f2_haplotypes.txt 
 
