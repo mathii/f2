@@ -30,8 +30,8 @@ do
     echo "$CODE_DIR/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
 done
 
-# xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=N_PROCS --replace --verbose /bin/sh -c "{}"
-# rm ${SIMS_ROOT}/tmp_args
+xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=N_PROCS --replace --verbose /bin/bash -c "{}"
+rm ${SIMS_ROOT}/tmp_args
 
 # # Now run files to combine results
 # mkdir -p ${SIMS_ROOT}/all

@@ -17,7 +17,7 @@ def parse_options():
     options ={ "haplotype_file":"", "out":"", "n":0  }
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h:o:n:", ["hap","out","n"])
+        opts, args = getopt.getopt(sys.argv[1:], "h:o:n:v:", ["hap","out","n", "verbose"])
     except Exception as err:
         print str(err)
         sys.exit()
@@ -26,6 +26,7 @@ def parse_options():
         if o in ["-h","--hap"]:           options["haplotype_file"] = a
         elif o in ["-o","--out"]:         options["out"] = a
         elif o in ["-n","--n"]:           options["n"] = int(a)
+        elif o in ["-v","--ver"]:         options["verbose"] = bool(a)
 
     print "found options:"
     print options
@@ -52,7 +53,7 @@ def main(options):
     line_count=1
     for line in haps_in:
 
-        if not line_count%REP_INT:
+        if options["verbose"] and not line_count%REP_INT:
             print "\rLine " + str(line_count),
             sys.stdout.flush()
         line_count+=1

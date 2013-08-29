@@ -11,7 +11,7 @@
 ## chr: chromosome
 ########################################################################################################
 
-find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0  ){
+find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, verbose=FALSE  ){
   f2 <- load.fn(f2.file)
   f1 <- load.fn(f1.file)
   pos <- scan(pos.file, quiet=TRUE)
@@ -38,7 +38,7 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
   last.ID.from=-1
 
   for(i in 1:number.f2){
-    cat(paste("\rChr", chr, " (", i, "/", number.f2,") ", sep=""))
+    if(verbose){cat(paste("\rChr", chr, " (", i, "/", number.f2,") ", sep=""))}
     this.pos <- f2$pos[i]
     this.ID.to <- f2$ID.to[i]
     this.ID.from <- f2$ID.from[i]

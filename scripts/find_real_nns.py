@@ -15,10 +15,10 @@ def parse_options():
     """
     Options are described by the help() function
     """
-    options ={ "tree_file":"", "tree_len_file":"", "out_file":"", "tree_pos_file":"", "resolution":1  }
+    options ={ "tree_file":"", "tree_len_file":"", "out_file":"", "tree_pos_file":"", "resolution":1, "verbose":False  }
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:p:l:o:r:", ["gt", "p", "len", "out", "res"])
+        opts, args = getopt.getopt(sys.argv[1:], "t:p:l:o:r:v:", ["gt", "p", "len", "out", "res", "verbose"])
     except Exception as err:
         print str(err)
         sys.exit()
@@ -29,6 +29,7 @@ def parse_options():
         elif o in ["-o","--out"]:     options["out_file"] = a
         elif o in ["-p","--pos"]:     options["tree_pos_file"] = a
         elif o in ["-r","--res"]:     options["resolution"] = int(a)
+        elif o in ["-v","--ver"]:     options["verbose"] = bool(a)
 
     print "found options:"
     print options
@@ -63,9 +64,10 @@ def main(options):
             continue
         else:
             last_pos=pos[i]
-        
-        print "\rTree " + str(i) +", pos "+ str(pos[i]) + ", " + str(chunks)+" chunks",
-        sys.stdout.flush()
+
+        if options["verbose"]:
+            print "\rTree " + str(i) +", pos "+ str(pos[i]) + ", " + str(chunks)+" chunks",
+            sys.stdout.flush()
         
         if None==N:
             N=tree.count_terminals()

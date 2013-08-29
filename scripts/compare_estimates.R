@@ -53,7 +53,7 @@ S.params.true$Ep <- S.params.true$Lp*4*Ne*mu/2/nseq
 
 cat("Calculating MLE\n")
 for(j in 1:NROW(matched)){
-  cat(paste("\r", j))
+  ## cat(paste("\r", j))
   ## Using true values
   max.search <- (10^max.log)/2/Ne
   t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
@@ -76,19 +76,19 @@ norm.2.p <- function(x){return(dnorm(x, mean=2))}
 denss <- list()
 ll.mats <- list()
 logt.grid <- seq(0, max.log, length.out=bins)
-ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=TRUE)
-ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=TRUE)
-ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=TRUE)
-ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true, verbose=TRUE)
-ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params, verbose=TRUE)
-ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=TRUE)
+ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
+ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
+ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=FALSE)
+ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true, verbose=FALSE)
+ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params, verbose=FALSE)
+ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
 
 cat("Sampling Densities\n")
 if(plots){pdf(paste(res.dir, "/mcmc_densities.pdf", sep=""), height=12, width=18)}else{dev.new()}
 par(mfrow=c(2,3))
 for(i in 1:6){
   ## Lg and D are dummy entries... the ll matrix is the only information we use... 
-  denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=TRUE, logt.grid=logt.grid, prior=norm.2.p, alpha=100,error.params=NA, n.sims=1000, thin=10, ll.mat=ll.mats[[i]])
+  denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=100,error.params=NA, n.sims=1000, thin=10, ll.mat=ll.mats[[i]])
 }
 if(plots){dev.off()}
 
