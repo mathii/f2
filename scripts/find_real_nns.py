@@ -4,7 +4,6 @@ from __future__ import division
 import numpy as np
 import gzip, sys, getopt
 from Bio import Phylo
-import pdb
 
 EPS1=1e-4                                  # small number to compare times 
 EPS2=1e10                                     # assume that this implies a tree change
@@ -78,7 +77,6 @@ def main(options):
             this_tmrca, this_subclade=find_tmrca_and_subclade(tree)
             last_tree=tree
             
-
         # First find all the nearest neighbour nodes on this tree
         terminal_nodes=tree.get_terminals()
         internal_nodes=tree.get_nonterminals()
@@ -163,6 +161,9 @@ def find_tmrca_and_subclade(tree):
     are in the subclade of each pair. i.e. all the terminal nodes of the mrca of the 
     pair of nodes
     """
+    # At some point Biopython changed the way it handled this, so setting it to 
+    # 0 seems like the defensive approach.
+    tree.root.branch_length=0.
     N=tree.count_terminals()
 
     # Initialise tmrca
