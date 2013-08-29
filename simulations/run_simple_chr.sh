@@ -9,6 +9,7 @@
 # Script arguments
 CHR=$1
 nbp=$2
+sleep_time=$3
 
 ##############################################################################################################
 
@@ -19,12 +20,13 @@ MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=~/f2/simulations/simple/chr${CHR}
 # Where is the recombination map, in impute format?
-HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
+#HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
+HM2_MAP=~/f2/f2_age/test/constant_map.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp=100
+nhp=200
 ne=14000
 dbp=0.66
 mu=0.000000012
@@ -43,7 +45,9 @@ do
     mkdir -p ${dir}
 done
 
-# redirect output to logfile 
+sleep ${sleep_time}
+
+# redirect output to logfile                                                                                                                                   
 LOG=${RD}/log.txt
 exec > ${LOG} 2>&1
 

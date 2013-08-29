@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Run the script run_simple_chr.sh for all chromosomes, then run some additional scripts to
 # consolitdate the results and report on the whole genome results. Need to edit the parameters
@@ -11,7 +11,7 @@ SIMS_ROOT=~/f2/simulations/simple/
 # Where is the code - this should point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 # How many parallel processes?
-N_PROCS=8
+N_PROCS=22
 ##############################################################################################################
 
 # from http://www.ncbi.nlm.nih.gov/projects/genome/assembly/grc/human/data/
@@ -27,10 +27,11 @@ mkdir -p ${SIMS_ROOT}
 rm -f ${SIMS_ROOT}/tmp_args
 for CHR in {1..22}
 do
-    echo "$CODE_DIR/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
+    sleep_time=`echo "10*${CHR}" | bc`
+    echo "$CODE_DIR/simulations/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]} ${sleep_time}" >> ${SIMS_ROOT}/tmp_args
 done
 
-xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=N_PROCS --replace --verbose /bin/bash -c "{}"
+xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
 rm ${SIMS_ROOT}/tmp_args
 
 # # Now run files to combine results
