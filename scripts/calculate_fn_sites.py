@@ -14,7 +14,7 @@ def parse_options():
     """
     Options are described by the help() function
     """
-    options ={ "haplotype_file":"", "out":"", "n":0  }
+    options ={ "haplotype_file":"", "out":"", "n":0, "verbose":False  }
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "h:o:n:v:", ["hap","out","n", "verbose"])
