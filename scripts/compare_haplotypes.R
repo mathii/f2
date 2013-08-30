@@ -22,7 +22,7 @@ if(length(args)==7){
 source(paste(code.dir, "/libs/include.R", sep=""))
 f2.haps <- read.table(paste(res.dir, "/f2_haplotypes.txt.gz", sep=""),  as.is=TRUE, header=TRUE)
 map <- read.table(map.file, as.is=TRUE, header=TRUE)
-sim.mapfn <- approxfun(map[,2]-min(map[,2]), map[,4] )
+sim.mapfn <- approxfun(map[,2]-min(map[,2]), map[,4], rule=2 )
 true.haps <- read.table(paste(hap.dir,"/NN_haplotypes.txt.gz", sep=""), as.is=TRUE, header=TRUE)
 
 ################################################################################################################
