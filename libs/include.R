@@ -6,10 +6,11 @@
 dir <- getwd()
 setwd(paste(code.dir ,"/libs/", sep=""))
 for( file in list.files() ){
-  if(file != "include.R"){
+  if(file != "include.R" & substring(file, nchar(file)-1)==".R"){
     source(file)
   }
 }
+try(dyn.load("inference.so"))            #Try to load the shared lib for density sampling
 setwd(dir)
 
  

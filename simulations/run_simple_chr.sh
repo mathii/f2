@@ -19,9 +19,9 @@ sleep_time=$3
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=~/f2/simulations/simple/chr${CHR}
+
 # Where is the recombination map, in impute format?
-#HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
-HM2_MAP=~/f2/f2_age/test/constant_map.txt.gz
+HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
@@ -49,7 +49,7 @@ sleep ${sleep_time}
 
 # redirect output to logfile                                                                                                                                   
 LOG=${RD}/log.txt
-exec > ${LOG} 2>&1
+# exec > ${LOG} 2>&1
 
 # compound params
 theta=`echo "4*$ne*$mu" | bc`
@@ -92,5 +92,5 @@ gzip -f ${RD}/f2_haplotypes.txt
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R
 gzip -f ${RD}/matched_haps.txt
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 < ${CD}/scripts/estimate_error_parameters.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 one.way < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} ${nhp} ${mu} 6 60 < ${CD}/scripts/compare_estimates.R

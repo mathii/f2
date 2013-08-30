@@ -8,7 +8,7 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==7){
+if(length(args)==8){
   code.dir <- args[1]
   hap.dir <- args[2]
   res.dir <- args[3]
@@ -16,8 +16,9 @@ if(length(args)==7){
   map.file <- args[5]
   pairs <- as.numeric(args[6])
   each <- as.numeric(args[7])
+  direction <- args[8]                  #either "one.way" or "two.way"
 } else{
-  stop("Need to specify 7 arguments")
+  stop("Need to specify 8 arguments")
 }
 
 ######################################################################################################
@@ -27,5 +28,5 @@ samples <- scan(sample.file, quiet=TRUE, what="")
 
 ######################################################################################################
 
-error.params <- fit.gamma.to.error(paste(hap.dir, "by_sample", sep="/"), samples , map.file, pairs=pairs, each=each, verbose=TRUE)
+error.params <- fit.gamma.to.error(paste(hap.dir, "by_sample", sep="/"), samples , map.file, pairs=pairs, each=each, verbose=TRUE, direction=direction)
 write.table(error.params, paste(res.dir, "error_params.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)

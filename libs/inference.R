@@ -126,42 +126,24 @@ compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params
 ## alpha: precision of prior
 ########################################################################################################
 
-estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:600)/100, verbose=FALSE, prior=function(x){return(1+0*x)}, ll.mat=NA, error.params=NA, S.params=NA, n.sims=1000, burn.in=100, thin=10, alpha=1){
-  n <- length(Lgs)
+estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbose=FALSE, prior=function(x){return(1+0*x)}, ll.mat=NA, error.params=NA, S.params=NA, n.sims=1000, burn.in=100, thin=10, alpha=1){
   k <- length(logt.grid)
-  ti <- rep(0, n)
   
   if(all(is.na(ll.mat))){
     ll.mat <- compute.ll.matrix( Lgs, Ds, Ne, pf, logt.grid=logt.grid, error.params=error.params, S.params=S.params)
   }
   f.mat <- exp(ll.mat)
-
-  counts <- 0*logt.grid
-  all.counts <- counts                  #record all counts. 
-  probs <- prior(logt.grid)
-  probs <- probs/sum(probs)
-  prior.probs=probs
-
-  if(verbose){plot(logt.grid, probs, col="blue", type="l", ylim=c(0,2*max(probs)))}
-
-  total.sims <- n.sims+burn.in
-  for(sim in 1:total.sims){
-    cat(paste("\rIteration", sim))
-    for(i in 1:n){
-      pr=probs*f.mat[i,]
-      if(all(f.mat[i,]==0)){
-        pr=probs
-      }
-      ti[i] <- sample(1:k, size=1, prob=pr)
+  for(i in 1:NROW(f.mat)){
+    if(all(f.mat[i,]==0)){
+      f.mat[i,] <- 1
     }
-    counts <- tabulate(ti, nbins=k)
-    probs <- counts/(alpha+n)+alpha*prior.probs/(alpha+n)
+  }  
 
-    if(verbose & !(sim%%thin)){lines(logt.grid, probs, col=rgb(sim/total.sims, 0, 1-sim/total.sims, 10*thin/n.sims))}
-    if(sim>burn.in & !((sim-burn.in)%%thin)){all.counts <- all.counts+counts}
-  }
-  cat("\n")
- 
+  prior.probs <- prior(logt.grid)
+  prior.probs <- prior.probs/sum(prior.probs)
+
+  all.counts <- mcmc.sample(f.mat, prior.probs, n.sims, burn.in, thin, alpha)
+
   all.probs <- all.counts/sum(all.counts)
   d.fun <- approxfun(logt.grid, all.probs)
   K <- integrate(d.fun, lower=min(logt.grid), upper=max(logt.grid))$value
@@ -169,6 +151,53 @@ estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:600)/100, verb
   
   return(d.fun)
 }
+
+########################################################################################################
+## Wrapper for the c function which does the mcmc sampling. If the compiled c sampler is available
+## use that, otherwise fall through to the R sampler. The c sampler is defined in inference.c, which
+## should be compiled with "R CMD SHLIB inference.c". The R version is of course *much* slower and
+## also unsupported. Really only for small examples, or debugging. 
+## 
+## f.mat: matrix of likelihoods
+## prior.probs: prior probabilities for each bin
+## n_sims, burn_in, thin, alpha: mcmc sampling parameters
+########################################################################################################
+
+mcmc.sample <- function(f.mat, prior.probs, n.sims, burn.in, thin, alpha){
+  if(is.loaded("mcmc_density_sampler")){
+    dims <- as.integer(dim(f.mat))
+    f.mat <- as.double(c(f.mat))
+    prior <- as.double(prior.probs)
+    mcmc.params <- as.integer(c(n.sims, burn.in, thin, alpha))
+    seed <- as.integer(1234)
+    all.counts <- as.integer(0*prior.probs)
+    res <- .C("mcmc_density_sampler", f.mat, dims, prior, mcmc.params, seed, all.counts)
+    all.counts <- res[[6]]
+  } else {
+    cat("Warning: Using unsupported R sampler. Results may be unreliable\n")
+    warning("Using unsupported R sampler. Results may be unreliable")
+    n <- NROW(f.mat)
+    k <- NCOL(f.mat)
+    
+    all.counts <- 0*logt.grid                  #record all counts.
+    probs <- prior.probs
+    plot(logt.grid, probs, col="blue", type="l", ylim=c(0,2*max(probs)))
+    total.sims <- n.sims+burn.in
+    for(sim in 1:total.sims){
+      counts <- 0*logt.grid
+      for(i in 1:n){
+        pr=probs*f.mat[i,]
+        ti <- sample(1:k, size=1, prob=pr)
+        counts[ti] <- counts[ti]+1
+      }
+      probs <- counts/(alpha+n)+alpha*prior.probs/(alpha+n)
+      lines(logt.grid, probs, col=rgb(sim/total.sims, 0, 1-sim/total.sims, 10*thin/n.sims))
+      if(sim>burn.in & !((sim-burn.in)%%thin)){all.counts <- all.counts+counts}
+    }
+  }
+  return(all.counts)
+}
+
 
 ########################################################################################################
 ## A_n(t), the expected number of lineges remaining in the coalescent at time t
@@ -184,10 +213,16 @@ wedding.cake <- function(t, n){
 }
 
 ########################################################################################################
-## helpter function for wedding.cake
+## Helper function for wedding.cake
 ## Note, if you need to call this a lot, tabulate it. 
 ########################################################################################################
 
 wedding.cake.ratio <- function(i,n){
   return(exp(log(2*i-1)+sum(log((n-i+1):n))-sum(log(n:(n+i-1)))))
 }
+
+########################################################################################################
+## just a weak prior for the log of the coalescent time
+########################################################################################################
+
+norm.2.p <- function(x){return(dnorm(x, mean=2))}

@@ -166,9 +166,11 @@ get.mapfn <- function(map.file){
 ## map.file: genetic map
 ## pairs, each: sample each points from pairs sets of individuals
 ## verbose: report progress
+## direction: either count randomly left or right and then double the distribution, or count both
+## ways and estimate the total. These give different answers because the results are correlated. 
 ########################################################################################################
 
-fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, each=1000, verbose=FALSE){
+fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, each=1000, verbose=FALSE, direction=c("one.way", "two.way")){
   LOWER.BOUND <- 1e-6                   #just to help with optimization
   pos <- scan(paste(path.to.samples, "/pos.gz", sep=""), quiet=TRUE)
   map <- get.mapfn(map.file)
@@ -196,10 +198,18 @@ fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, e
     }
   }
   if(verbose){cat("\n")}
-  results <- ifelse(runif(pairs*each)<0.5, results.l, results.r) #r and l are correlated, so we want one sided only. 
-  fit <- fitdistr(results[results>0], "gamma", lower=rep(LOWER.BOUND, 2))
-  error.params <- fit$estimate
-  error.params[1] <- error.params[1]*2  #double shape parameter since the overestimate is on both sides
+
+  if(direction[1]=="one.way"){
+    results <- ifelse(runif(pairs*each)<0.5, results.l, results.r) #r and l are correlated, so we want one sided only. 
+    fit <- fitdistr(results[results>0], "gamma", lower=rep(LOWER.BOUND, 2))
+    error.params <- fit$estimate
+    error.params[1] <- error.params[1]*2  #double shape parameter since the overestimate is on both sides
+  }else if(direction[1]=="two.way"){
+    results <- results.l+results.r
+    fit <- fitdistr(results[results>0], "gamma", lower=rep(LOWER.BOUND, 2))
+    error.params <- fit$estimate
+  }else{ stop("Don't recognise direction")}
+  
   error.params[2] <- error.params[2]*100  #convert to Morgans
   return(error.params)
 }

@@ -84,14 +84,12 @@ ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.
 ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
 
 cat("Sampling Densities\n")
-if(plots){pdf(paste(res.dir, "/mcmc_densities.pdf", sep=""), height=12, width=18)}else{dev.new()}
 par(mfrow=c(2,3))
 alpha <- round(0.05*NROW(matched))
 for(i in 1:6){
   ## Lg and D are dummy entries... the ll matrix is the only information we use... 
   denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mats[[i]])
 }
-if(plots){dev.off()}
 
 save.image(paste(res.dir, "/ll_and_density_environment.Rdata", sep=""))
 

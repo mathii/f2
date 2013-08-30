@@ -37,6 +37,7 @@ true.haps$f2 <- NA
 true.haps$map.len <- NA
 true.haps$f2.hap.id <- NA
 true.haps$Age <- true.haps$Age*Ne*4     #Is this a factor of 2.. ms says it is 4Ne?? 
+true.haps <- true.haps[true.haps$ID1!=true.haps$ID2,]
 
 ## a bit of a hack - to make sure that we catch the ones at the end.
 l.min <- min(f2.haps$hap.left)
@@ -73,7 +74,7 @@ pwr.matched <- matched[rbinom(NROW(matched), size=matched$f2, prob=dbl.pwr)>0,]
 
 
 ## Plot lengths
-elements.Lg=list("All"=log10(true.haps$true.map/100), "Detected"=log10(matched$true.map/100), "60% power"=log10(pwr.matched$true.map/100) )
+elements.Lg=list("All"=log10(true.haps$true.map/100), "Detected"=log10(matched$true.map/100), "66% power"=log10(pwr.matched$true.map/100) )
 elements.Lp=list("All"=log10(true.haps$End-true.haps$Start), "Detected"=log10(matched$End-matched$Start), "66% power"=log10(pwr.matched$End-pwr.matched$Start) )
 blues=c("#377EBA40", "#377EBA80", "#377EBAB0")
 border.blues=c("#377EBA", "#377EBA", "#377EBA")
@@ -85,16 +86,6 @@ if(plots){dev.off()}
 if(plots){pdf(paste(res.dir, "/distribution_physical_length.pdf", sep=""))}else{dev.new()}
 overlapping.density.plot(elements.Lp, cols=blues, borders=border.blues, xlab=expression(Log[10]~"(Length (b))"), main="Physical length")
 if(plots){dev.off()}
-
-
-## Plot power 
-all.map.hist <- hist(log10(true.haps$true.map), plot=FALSE, breaks=40)
-match.map.hist <- hist(log10(matched$true.map), plot=FALSE, breaks=all.map.hist$breaks)
-pwr.match.map.hist <- hist(log10(pwr.matched$true.map), plot=FALSE, breaks=all.map.hist$breaks)
-
-all.hist <- hist(log10(true.haps$End-true.haps$Start), plot=FALSE, breaks=40)
-match.hist <- hist(log10(matched$End-matched$Start), plot=FALSE, breaks=all.hist$breaks)
-pwr.match.hist <- hist(log10(pwr.matched$End-pwr.matched$Start), plot=FALSE, breaks=all.hist$breaks)
 
 ## and power
 x <- log10(matched$End - matched$Start)
