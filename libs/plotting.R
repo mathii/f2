@@ -51,10 +51,10 @@ add.density.to.plot <- function(dens, true.age, qs=c(0.01,0.99), col="#E41A1C", 
 ## dens: density function, asa function of log(age)
 ## true.age: vector of length n with true ages in generations
 
-plot.mle.and.density <- function(true.age, t.hat, dens, ...){
-  plot(log10(true.age), log10(t.hat), col="#377EBA15", bty="n", xlab="True age", ylab="Estimated age", pch=16, ...)
+plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15",  ...){
+  plot(log10(true.age), log10(t.hat), col=paste("#377EBA", alpha, sep=""), bty="n", xlab="True age", ylab="Estimated age", pch=16, ...)
   qq.mle <- qqplot(log10(true.age), log10(t.hat), plot.it=FALSE)
-  lines(qq.mle, col="#377EBA")
+  lines(qq.mle, col="#4DAF4A")
   abline(0,1,col="black", lty=2)
   add.density.to.plot(dens, true.age)
 }

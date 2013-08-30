@@ -1,5 +1,8 @@
 ## Combine the estimates from different chromosomes, estimate the overall densities
 
+######################################################################################################
+
+library(RColorBrewer)
 args <- commandArgs(TRUE)
 set.seed(12345)
 
@@ -17,7 +20,7 @@ if(length(args)==3){
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-chrs <- 16:22
+chrs <- 1:22
 
 ######################################################################################################
 
@@ -67,14 +70,15 @@ denss <- list()
 alpha <- round(0.05*NROW(matched))
 for(i in 1:6){
   ## Lg and D are dummy entries... the ll matrix is the only information we use... 
-  denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=TRUE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=1000, thin=10, ll.mat=ll.mats[[i]])
+  denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=TRUE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mats[[i]])
 }
 
+max.log <- max(logt.grid)
 labels=c("True (Lg)", "Observed (Lg)", "Corrected (Lg)", "True (Lg+S)", "Observed (Lg+S)", "Corrected (Lg+S)")
-if(plots){pdf(paste(res.dir, "/compare_estimates.pdf", sep=""), height=12, width=18)}else{dev.new()}
+if(plots){png(paste(res.dir, "/compare_estimates.png", sep=""), height=1200, width=1800)}else{dev.new()}
 par(mfrow=c(2,3))
 for(i in 1:6){
-  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log))
+  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log), cex=2, alpha="10")
 }
 if(plots){dev.off()}
 

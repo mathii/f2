@@ -83,7 +83,7 @@ python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/haps.f2.gz -o ${TH}/pos.idx.
 python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/haps.gz  -o ${TH}/by_sample/ -s ${TH}/samples.txt
 
 # 6) Estimate haplotypes from f2 variants
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt 0 one.way < ${CD}/scripts/haplotypes_from_f2.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt 0 two.way < ${CD}/scripts/haplotypes_from_f2.R
 gzip -f ${RD}/f2_haplotypes.txt 
 
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
