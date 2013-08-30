@@ -62,8 +62,10 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     ibd.pos <- pos[ibd]
     ibd.len <- ibd.pos[2]-ibd.pos[1]
 
+    ## Note here for doubletons, we really mean >/< rather than >=/<=. However since the breakpoints are inconsistent homozygotes
+    ## they can't be consistent doubletons so it doesn't matter and >/< handles the case where the f2 is at the end of the chrom. 
     singletons <- NROW(f1[(f1$ID1==this.ID.from|f1$ID1==this.ID.to) & f1$pos>ibd.pos[1] & f1$pos<ibd.pos[2],])
-    doubletons <- NROW(f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>ibd.pos[1] & f2$pos<ibd.pos[2],])
+    doubletons <- NROW(f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>=ibd.pos[1] & f2$pos<=ibd.pos[2],])
     
     f2$ibd.len[i] <- ibd.len
     f2$hap.left[i] <- ibd.pos[1]
