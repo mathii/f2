@@ -74,8 +74,11 @@ pwr.matched <- matched[rbinom(NROW(matched), size=matched$f2, prob=dbl.pwr)>0,]
 
 
 ## Plot lengths
-elements.Lg=list("All"=log10(true.haps$true.map/100), "Detected"=log10(matched$true.map/100), "66% power"=log10(pwr.matched$true.map/100) )
-elements.Lp=list("All"=log10(true.haps$End-true.haps$Start), "Detected"=log10(matched$End-matched$Start), "66% power"=log10(pwr.matched$End-pwr.matched$Start) )
+pwr.lab=paste(round(100*dbl.pwr), "% power", sep="")
+elements.Lg=list("All"=log10(true.haps$true.map/100), "Detected"=log10(matched$true.map/100), "Power"=log10(pwr.matched$true.map/100) )
+elements.Lp=list("All"=log10(true.haps$End-true.haps$Start), "Detected"=log10(matched$End-matched$Start), "Power"=log10(pwr.matched$End-pwr.matched$Start) )
+names(elements.Lg)[[3]] <- pwr.lab
+names(elements.Lp)[[3]] <- pwr.lab
 blues=c("#377EBA40", "#377EBA80", "#377EBAB0")
 border.blues=c("#377EBA", "#377EBA", "#377EBA")
 reds=c("#E41A1C40", "#E41A1C80", "#E41A1CB0")

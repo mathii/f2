@@ -34,6 +34,10 @@ done
 xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
 rm ${SIMS_ROOT}/tmp_args
 
-# # Now run files to combine results
-# mkdir -p ${SIMS_ROOT}/all
+# Now run files to combine results
+mkdir -p ${SIMS_ROOT}/all
+R --vanilla --slave --quiet --args ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} 0.66 < ${CODE_DIR}/scripts/combine_compare_haplotypes.R
+R --vanilla --slave --quiet --args ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} < ${CODE_DIR}/scripts/combine_compare_estimates.R
 
+
+ 
