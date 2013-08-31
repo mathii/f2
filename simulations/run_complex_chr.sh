@@ -23,8 +23,8 @@ HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp1=50
-nhp2=50
+nhp1=100
+nhp2=100
 ne=10000
 dbp=0.66
 mu=0.000000012
@@ -83,11 +83,11 @@ python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/haps.f2.gz -o ${TH}/pos.idx.
 python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/haps.gz  -o ${TH}/by_sample/ -s ${TH}/samples.txt
 
 # 6) Estimate haplotypes from f2 variants
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt 0 two.way < ${CD}/scripts/haplotypes_from_f2.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${MD}/cut.map.txt 0 < ${CD}/scripts/haplotypes_from_f2.R
 gzip -f ${RD}/f2_haplotypes.txt 
 
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R
 gzip -f ${RD}/matched_haps.txt
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 < ${CD}/scripts/estimate_error_parameters.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 two.way < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} ${nhp} ${mu} 6 60 < ${CD}/scripts/compare_estimates.R
