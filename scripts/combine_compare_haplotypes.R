@@ -31,7 +31,7 @@ for(chr in chrs){
   cat(paste("\r", chr))
   this.true.haps <- read.table(paste(chr.res.dir, "/chr", chr, "/haplotypes/NN_haplotypes.txt.gz", sep=""), as.is=TRUE, header=TRUE)
   map <- read.table(paste(chr.res.dir, "/chr", chr, "/map/cut.map.txt", sep=""), as.is=TRUE, header=TRUE)
-  sim.mapfn <- approxfun(map[,2]-min(map[,2]), map[,4] )
+  sim.mapfn <- approxfun(map[,2]-min(map[,2]), map[,4], rule=2 )
   this.true.haps$true.map <- sim.mapfn(this.true.haps$End)-sim.mapfn(this.true.haps$Start)
   this.true.haps <- this.true.haps[this.true.haps$ID1!=this.true.haps$ID2,]
   
