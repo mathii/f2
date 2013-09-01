@@ -12,6 +12,9 @@ SIMS_ROOT=~/f2/simulations/simple/
 CODE_DIR=~/f2/f2_age
 # How many parallel processes?
 N_PROCS=22
+# What type of simulation to run
+sim_type=simple
+
 ##############################################################################################################
 
 # from http://www.ncbi.nlm.nih.gov/projects/genome/assembly/grc/human/data/
@@ -28,7 +31,7 @@ rm -f ${SIMS_ROOT}/tmp_args
 for CHR in {1..22}
 do
     sleep_time=`echo "10*${CHR}" | bc`
-    echo "$CODE_DIR/simulations/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]} ${sleep_time}" >> ${SIMS_ROOT}/tmp_args
+    echo "$CODE_DIR/simulations/run_simple_chr.sh ${CHR} ${CHR_LENGTHS[${CHR}]} ${sim_type} ${sleep_time}" >> ${SIMS_ROOT}/tmp_args
 done
 
 xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"

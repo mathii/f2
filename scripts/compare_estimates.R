@@ -1,7 +1,7 @@
 ## compute and compare the age estimates. Need to generate the matched haplotypes
 ## using compare_haplotypes.R first, saved in res.dir/matched_haps.txt.gz
 ## Script compares results using genetic length with and without singletons, 
-## and with and without corrections. Geneitc length corrections us a gamma(1.2, 375M)
+## and with and without corrections. Geneitc length corrections us a gamma
 ## distribution, which was estimated from simulated human data. 
 
 ######################################################################################################
