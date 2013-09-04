@@ -6,6 +6,7 @@
 ## est.ages: matrix of nxk with the k lines we want plotted
 ## labels: names of the lines
 ## cols, lty: colors and types of the lines.
+############################################################################################################################
 
 plot.coverage.curves <- function(true.age, t.hats, labels, cols, lty, lwd=1, grid=seq(0,1,length.out=100), ... ){
   n <- NROW(t.hats)
@@ -34,6 +35,7 @@ plot.coverage.curves <- function(true.age, t.hats, labels, cols, lty, lwd=1, gri
 ## dens: density function, asa function of log(age)
 ## true.age: vector of length n with true ages in generations
 ## qs - quantile limits
+############################################################################################################################
 
 add.density.to.plot <- function(dens, true.age, qs=c(0.01,0.99), col="#E41A1C", xmax=4){
   xs=seq(0,xmax, length.out=500)
@@ -50,9 +52,10 @@ add.density.to.plot <- function(dens, true.age, qs=c(0.01,0.99), col="#E41A1C", 
 ## t.hat: vector of length n with estimated ages in generations
 ## dens: density function, asa function of log(age)
 ## true.age: vector of length n with true ages in generations
+############################################################################################################################
 
-plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15",  ...){
-  plot(log10(true.age), log10(t.hat), col=paste("#377EBA", alpha, sep=""), bty="n", xlab="True age", ylab="Estimated age", pch=16, ...)
+plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15", cols="#377EBA", ...){
+  plot(log10(true.age), log10(t.hat), col=paste(cols, alpha, sep=""), bty="n", xlab="True age", ylab="Estimated age", pch=16, ...)
   qq.mle <- qqplot(log10(true.age), log10(t.hat), plot.it=FALSE)
   lines(qq.mle, col="#4DAF4A")
   abline(0,1,col="black", lty=2)
@@ -66,6 +69,7 @@ plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15",  ...){
 ## elements: list of vectors of objects, names taken from name of list
 ## cols: colours to plot
 ## borders: border colours
+############################################################################################################################
 
 overlapping.density.plot <- function(elements, cols, borders, main="", xlab="", legend.pos="topleft", ...){
   n <- length(elements)
@@ -91,6 +95,7 @@ overlapping.density.plot <- function(elements, cols, borders, main="", xlab="", 
 ## elements: list of vectors of objects, names taken from name of list
 ## cols: colours to plot
 ## borders: border colours
+############################################################################################################################
 
 overlapping.power.plot <- function(elements, cols, main="", xlab="", legend.pos="topleft", lwd=2, lty=1, ...){
   n <- length(elements)
@@ -113,4 +118,38 @@ overlapping.power.plot <- function(elements, cols, main="", xlab="", legend.pos=
   if(!all(is.null(names(elements)))){
     legend(legend.pos, names(elements)[2:n], col=cols, lwd=lwd, lty=lty, bty="n")
   }
+}
+
+############################################################################################################################
+## Just plot a list of density estimates, where the densities are just functions
+## densities: A list of densities, with names
+## grid: Interpolate at these points
+## cols: Colors to plot densities
+## lwd, lty: standard graphical parameters
+############################################################################################################################
+
+plot.densities <- function(densities, grid, cols, lwd=1, lty=1, ...){
+  names <- names(densities)
+  n <- length(names)
+  plot(grid, densities[[1]](grid), col=cols[1], lwd=lwd, lty=lty, bty="n", type="l", ...)
+  if(n>1){
+    for(i in 2:n){
+      lines(grid, densities[[i]](grid), col=cols[i], lwd=lwd, lty=lty)
+    }
+  }
+  legend("topright", names(densities), col=cols, lwd=lwd, lty=lty, bty="n")
+}
+
+############################################################################################################################
+## Find quantile of density
+## density: a function, which is a density
+## quantile: the quantile to find
+############################################################################################################################
+
+quantile.density <- function(dens, quantile, lower=0, upper=6){
+  ff <- function(x){
+    return((integrate(dens, lower=lower, upper=x, stop.on.error=FALSE)$value-quantile)^2)
+  }
+
+  return(optimize(ff, interval=c(lower,upper))$minimum) 
 }

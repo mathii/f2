@@ -1,0 +1,104 @@
+## Analyse results from 1kg for a single chromosome. Should be fairly easy to modify to run
+## on general data. 
+
+######################################################################################################
+
+library(RColorBrewer)
+args <- commandArgs(TRUE)
+set.seed(12345)
+
+######################################################################################################
+
+if(length(args)==7){
+  code.dir <- args[1]
+  res.dir <- args[2]
+  Ne <- as.numeric(args[3])
+  nseq <- as.numeric(args[4])
+  mu <- as.numeric(args[5])
+  max.log <- as.numeric(args[6])
+  bins <- as.numeric(args[7])
+  plots <- TRUE
+} else{
+  stop("Need to specify 7 arguments")
+}
+
+######################################################################################################
+
+source(paste(code.dir, "/libs/include.R", sep=""))
+source(paste(code.dir, "/analysis/1kgsetup.R", sep=""))
+haps <- read.table(paste(res.dir, "/f2_haplotypes.txt.gz", sep=""), as.is=TRUE, header=TRUE)
+error.params <- scan(paste(res.dir, "error_params.txt", sep="/"), quiet=TRUE)
+theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TRUE)
+
+######################################################################################################
+
+if(!("p.fun" %in% ls())){
+  cat("Making pn function\n")
+  p.fun <- make.pnfn(nseq*2)              #probably need to speed this up.
+  ## p.fun <- make.pnfn(250)              #probably need to speed this up. 
+}
+
+haps$hap.len <- haps$hap.right-haps$hap.left
+haps <- haps[haps$map.len>0,]
+
+## Singleton parameters
+S.params <- haps[,c("f1", "hap.len")]
+names(S.params) <- c("S", "Lp")
+S.params$theta <- 4*Ne*mu
+S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+
+## Compute likelihood
+cat("Computing likelihood\n")
+logt.grid <- seq(0, max.log, length.out=bins)
+ll.mat <- compute.ll.matrix( haps$map.len, haps$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
+
+save.image(paste(res.dir, "/ll_environment.Rdata", sep=""))
+
+## estimate densities, by population.
+populations <- sort(unique(pop.map))
+npop <- length(populations)             #14
+densities <- rep(list(list()),npop)
+
+ID1.pop <- pop.map[haps$ID1]
+ID2.pop <- pop.map[haps$ID2]
+for(i in 1:(npop)){
+  for(j in i:npop){
+    include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
+    alpha <- round(0.05*sum(include))
+    dens <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[include,])
+    densities[[i]][[j]] <- dens
+    densities[[j]][[i]] <- dens    
+  }
+}
+
+## plots. One plot of all within-group densities, and one of all densities in total.
+within.list <- list()
+for(i in 1:npop){
+  within.list[[i]] <- densities[[i]][[i]]
+}
+names(within.list) <- populations
+if(plots){pdf(paste(res.dir, "/within.pdf", sep=""))}else{dev.new()}
+plot.densities(within.list, logt.grid, cols=pop.cols[populations], xlim=c(1,5), ylim=c(0,2.5), main="Within")
+if(plots){dev.off()}
+
+for(i in 1:npop){
+  between.list <- list()
+  for(j in 1:npop){
+    between.list[[j]] <- densities[[i]][[j]]
+  }
+  names(between.list) <- populations
+
+  if(plots){pdf(paste(res.dir, "/between_", populations[i], ".pdf", sep=""))}else{dev.new()}
+  plot.densities(between.list, logt.grid, cols=pop.cols[populations], xlim=c(1,5), ylim=c(0,2.5), main=populations[i])
+  if(plots){dev.off()}
+}
+
+medians <- matrix(0, npop, npop)
+for(i in 1:npop){
+  for(j in 1:npop){
+    medians[i,j] <- 10^quantile.density(densities[[i]][[j]], 0.5)
+  }
+}
+colnames(medians) <- rownames(medians) <- populations
+write.table(medians, paste(res.dir, "/medians.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+

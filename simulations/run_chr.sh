@@ -65,27 +65,35 @@ case $sim_type in
 simple)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-;;
+	;;
 complex)
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
 	    -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.1 2 1 -T 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
 	    | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-;;
+	;;
 expanding)
-        ${MACS_DIR}/macs ${nhp} ${nbp} ${nhp} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -eg 23.026 -ej 0.1 2 1 -T 2> \
+        ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -eN 0 10 -G 23.026 -eN 0.1 1 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-;;
-two_simple)
+	;;
+ancient_split)
 	nhp=`echo "$nhp1+$nhp2" | bc`
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -T 2> \
+            -h 1e3 -R ${MD}/map.txt -ej 0.1 2 1 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-;;
+	;;
+recent_split)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.01 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+esac
 
 # 3)Parse the macs output to get trees and genotypes
 gzip -f ${WD}/trees.txt
@@ -117,5 +125,5 @@ gzip -f ${RD}/f2_haplotypes.txt
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R
 gzip -f ${RD}/matched_haps.txt
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 two.way < ${CD}/scripts/estimate_error_parameters.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} ${nhp} ${mu} 6 60 < ${CD}/scripts/compare_estimates.R

@@ -34,7 +34,6 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA){
 
   t2 <- 0
   if(!all(is.na(S.params))){            #If we supplied singleton information, use that. 
-    ## t2 <- dpois(S.params$S, lambda=S.params$theta*S.params$Lp*t + 2*S.params$Ep, log=TRUE) 
     ## Sum of poisson and negative binomial...
     S <- S.params$S
     s.vals <- 0:S

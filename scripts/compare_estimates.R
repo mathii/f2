@@ -21,6 +21,7 @@ if(length(args)==7){
   max.log <- as.numeric(args[6])
   bins <- as.numeric(args[7])
   plots <- TRUE
+  ## plots <- FALSE
 } else{
   stop("Need to specify 7 arguments")
 }
@@ -30,26 +31,28 @@ if(length(args)==7){
 source(paste(code.dir, "/libs/include.R", sep=""))
 matched <- read.table(paste(res.dir, "/matched_haps.txt.gz", sep=""), as.is=TRUE, header=TRUE)
 error.params <- scan(paste(res.dir, "error_params.txt", sep="/"), quiet=TRUE)
+theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TRUE)
 
 ######################################################################################################
 
 cat("Calculating pn(t)\n")
-if(!("p.fun" %in% ls())){
-  p.fun <- make.pnfn(2*nseq)
-}
-                    
+p.fun <- function(t){return(1)}
+## if(!("p.fun" %in% ls())){
+##   p.fun <- make.pnfn(2*nseq)
+## }
+
 ## Set up singleton params
 t.hats <- matrix(0, nrow=NROW(matched), ncol=6)
 S.params <- matched[,c("f1", "hap.len")]
 names(S.params) <- c("S", "Lp")
 S.params$theta <- 4*Ne*mu
-S.params$Ep <- S.params$Lp*4*Ne*mu/2/nseq
+S.params$Ep <- S.params$Lp*(theta.estimates[matched$ID1]+theta.estimates[matched$ID2])
 
 ## Real true S and Lp, for comparison. 
 S.params.true <- matched[,c("true.f1", "true.len")]
 names(S.params.true) <- c("S", "Lp")
 S.params.true$theta <- 4*Ne*mu
-S.params.true$Ep <- S.params.true$Lp*4*Ne*mu/2/nseq
+S.params.true$Ep <-  S.params.true$Lp*(theta.estimates[matched$ID1]+theta.estimates[matched$ID2])
 
 cat("Calculating MLE\n")
 for(j in 1:NROW(matched)){
@@ -84,7 +87,6 @@ ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.
 ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
 
 cat("Sampling Densities\n")
-par(mfrow=c(2,3))
 alpha <- round(0.05*NROW(matched))
 for(i in 1:6){
   ## Lg and D are dummy entries... the ll matrix is the only information we use... 
