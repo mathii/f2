@@ -35,11 +35,7 @@ theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TR
 
 ######################################################################################################
 
-cat("Calculating pn(t)\n")
 p.fun <- function(t){return(1)}
-## if(!("p.fun" %in% ls())){
-##   p.fun <- make.pnfn(2*nseq)
-## }
 
 ## Set up singleton params
 t.hats <- matrix(0, nrow=NROW(matched), ncol=6)

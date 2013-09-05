@@ -125,5 +125,5 @@ gzip -f ${RD}/f2_haplotypes.txt
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R
 gzip -f ${RD}/matched_haps.txt
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 100 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} ${nhp} ${mu} 6 60 < ${CD}/scripts/compare_estimates.R
