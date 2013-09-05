@@ -15,6 +15,7 @@ nbp=$4
 # Edit parameters here. 
 
 # Where do you want the simulations to go?
+VCFTOOLS=~/Packages/vcftools_0.1.11/bin/vcftools
 SIMS_DIR=/data1/users/mathii/1000g/results/chr${CHR}
 # Where are the recombination maps, in impute format
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
@@ -43,7 +44,7 @@ theta=`echo "4*$ne*$mu" | bc`
 # set max number of file descriptors
 ulimit -n 1200
 # Keep only the Phase 1 samples
-vcftools --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
+${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
     --out ${TH}/chr${CHR}.1092.tmp --recode-to-stream | gzip -c > ${TH}/chr${CHR}.1092.tmp.vcf.gz
 # Convert to flat format
 zgrep -v "^#" ${TH}/chr${CHR}.1092.tmp.vcf.gz \
