@@ -15,7 +15,7 @@ nbp=$4
 # Edit parameters here. 
 
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/1000g/results/chr${CHR}
+SIMS_DIR=/data1/users/mathii/1000g/results/chr${CHR}
 # Where are the recombination maps, in impute format
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
@@ -76,3 +76,4 @@ gzip -f ${RD}/f2_haplotypes.txt
 # 3) Estimate distributions
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${SAMPLES} ${HM2_MAP} 20 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} 1092 ${mu} 6 60 < ${CD}/scripts/run_1kg_analysis_chr.R
+
