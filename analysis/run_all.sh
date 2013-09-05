@@ -5,9 +5,12 @@
 ##############################################################################################################
 
 # Where are the simulation results. Should be of the form SIMS_ROOT/chr${CHR}/ where chr runs from 1 to 22
-SIMS_ROOT=~/f2/simulations/analysis/
+SIMS_ROOT=/data1/users/mathii/1000g/results/
 # Where is the code - this should point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
+# Where are the seq and chip data vcfs, replace XX with chromosome number 1..22
+SEQ_DATA=/data1/users/mathii/1000g/data/seq/ALL.chrXX.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz
+CHIP_DATA=/data1/users/mathii/1000g/data/chip/ALL.chrXX.omni_2123_samples_b37_SHAPEIT.20120103.snps.chip_based.haplotypes.vcf.gz
 # How many parallel processes?
 N_PROCS=22
 
@@ -26,7 +29,9 @@ mkdir -p ${SIMS_ROOT}
 rm -f ${SIMS_ROOT}/tmp_args
 for CHR in {1..22}
 do
-    echo "$CODE_DIR/analysis/run_chr.sh ${CHR} /data1/users/mathii/1000g/data/seq/ALL.chr${CHR}.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz /data1/users/mathii/1000g/data/chip/ALL.chr${CHR}.omni_2123_samples_b37_SHAPEIT.20120103.snps.chip_based.haplotypes.vcf.gz ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
+    seq_path=${SEQ_DATA/XX/$CHR}
+    chip_path=${CHIP_DATA/XX/$CHR}
+    echo "$CODE_DIR/analysis/run_chr.sh ${CHR} ${seq_path} ${chip_path} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
 done
 
 xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"

@@ -15,7 +15,7 @@ nbp=$4
 # Edit parameters here. 
 
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/1000g/chr${CHR}
+SIMS_DIR=~/f2/1000g/results/chr${CHR}
 # Where are the recombination maps, in impute format
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
