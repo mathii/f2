@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -vx
 
 # Run analysis of [1000 genomes or other] real data. Find all shared haplotypes
 # around f2 variants and estimate their age. For a single chromosome. 
@@ -37,15 +37,15 @@ do
     mkdir -p ${dir}
 done
 
-LOG=${RD}/log.txt
-exec > ${LOG} 2>&1                                                                                                                                        
+#LOG=${RD}/log.txt
+#exec > ${LOG} 2>&1                                                                                                                                        
 
 theta=`echo "4*$ne*$mu" | bc`
 
 # 1) Parse data into correct format 
 # 1.1) Chip data
 # set max number of file descriptors
-limit -n 1200
+ulimit -n 1200
 # Keep only the Phase 1 samples
 ${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
     --out ${TH}/chr${CHR}.1092.tmp --recode-to-stream | gzip -c > ${TH}/chr${CHR}.1092.tmp.vcf.gz
@@ -63,7 +63,7 @@ rm ${TH}/all.chr${CHR}.chip.haps.gz
 # 1.2) Sequence data - extract singletons and doubletons
 for n in 1 2
 do
-    vcftools --gzvcf ${path_to_seq_data}  --out ${TH}/chr${CHR}.f${n}.log.tmp \
+    ${VCFTOOLS} --gzvcf ${path_to_seq_data}  --out ${TH}/chr${CHR}.f${n}.log.tmp \
         --recode-to-stream --mac $n --max-mac $n | grep -v "^#" \
         | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
         | gzip -c > ${TH}/chr${CHR}.f${n}.haps.gz
