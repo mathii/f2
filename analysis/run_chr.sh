@@ -37,12 +37,15 @@ do
     mkdir -p ${dir}
 done
 
+LOG=${RD}/log.txt
+exec > ${LOG} 2>&1                                                                                                                                        
+
 theta=`echo "4*$ne*$mu" | bc`
 
 # 1) Parse data into correct format 
 # 1.1) Chip data
 # set max number of file descriptors
-ulimit -n 1200
+limit -n 1200
 # Keep only the Phase 1 samples
 ${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
     --out ${TH}/chr${CHR}.1092.tmp --recode-to-stream | gzip -c > ${TH}/chr${CHR}.1092.tmp.vcf.gz

@@ -51,7 +51,7 @@ sleep ${sleep_time}
 
 # redirect output to logfile                                                                                                                                   
 LOG=${RD}/log.txt
-# exec > ${LOG} 2>&1
+exec > ${LOG} 2>&1
 
 # compound params
 theta=`echo "4*$ne*$mu" | bc`
