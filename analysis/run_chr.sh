@@ -65,7 +65,7 @@ do
         | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
         | gzip -c > ${TH}/chr${CHR}.f${n}.haps.gz
 
-    python ~/trees/code/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f${n}.haps.gz -o ${TH}/pos.idx.f${n}.gz -n $n > ${TH}/pos.idx.f${n}.tmp.log 
+    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f${n}.haps.gz -o ${TH}/pos.idx.f${n}.gz -n $n > ${TH}/pos.idx.f${n}.tmp.log 
 done
 
 
