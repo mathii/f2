@@ -37,8 +37,8 @@ do
     mkdir -p ${dir}
 done
 
-#LOG=${RD}/log.txt
-#exec > ${LOG} 2>&1                                                                                                                                        
+LOG=${RD}/log.txt
+exec > ${LOG} 2>&1                                                                                                                                        
 
 theta=`echo "4*$ne*$mu" | bc`
 
