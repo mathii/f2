@@ -79,7 +79,10 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     last.ibd.pos <- ibd.pos
   }
 
-     return(f2[f2$ibd.len>0,])
+  ## Exclude samples which either hit the ends of the chromosome, or which have 0 length 
+  exclude <- (f2$ibd.len==0) | (f2$hap.right==max(pos)) | (f2$hap.left==min(pos))
+  
+  return(f2[!exclude,])
 }
 
 ########################################################################################################

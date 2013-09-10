@@ -32,11 +32,13 @@ theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TR
 
 ######################################################################################################
 
-if(!("p.fun" %in% ls())){
-  cat("Making pn function\n")
-  p.fun <- make.pnfn(nseq*2)              #probably need to speed this up.
-  ## p.fun <- make.pnfn(250)              #probably need to speed this up. 
-}
+#if(!("p.fun" %in% ls())){
+#  cat("Making pn function\n")
+#  p.fun <- make.pnfn(nseq*2)              #probably need to speed this up.
+#  ## p.fun <- make.pnfn(250)              #probably need to speed this up. 
+#}
+
+p.fun<-function(t){return(1)}
 
 haps$hap.len <- haps$hap.right-haps$hap.left
 haps <- haps[haps$map.len>0,]
