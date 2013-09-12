@@ -142,13 +142,28 @@ estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbos
   prior.probs <- prior.probs/sum(prior.probs)
 
   all.counts <- mcmc.sample(f.mat, prior.probs, n.sims, burn.in, thin, alpha)
-
   all.probs <- all.counts/sum(all.counts)
-  d.fun <- approxfun(logt.grid, all.probs)
-  K <- integrate(d.fun, lower=min(logt.grid), upper=max(logt.grid))$value
+  K <- integrate.trapezium(logt.grid, all.probs)
   d.fun <- approxfun(logt.grid, all.probs/K)
   
   return(d.fun)
+}
+
+########################################################################################################
+## Integrate a piecewise linear function, with points at x and y, using the trapezium rule
+## x: x values
+## y: y values
+########################################################################################################
+
+integrate.trapezium <- function(x,y){
+  ln <- length(x)
+  if(length(y)!=ln){stop("x and y lengths do not match")}
+
+  xi<-x[1:(ln-1)]
+  xi1<-x[2:ln]
+  yi<-y[1:(ln-1)]
+  yi1<-y[2:ln]
+  return(sum((xi1-xi)*(pmin(yi1,yi)+0.5*abs(yi1-yi))))
 }
 
 ########################################################################################################

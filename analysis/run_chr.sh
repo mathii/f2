@@ -78,6 +78,6 @@ R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${HM2_MAP
 gzip -f ${RD}/f2_haplotypes.txt 
 
 # 3) Estimate distributions
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${SAMPLES} ${HM2_MAP} 20 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${SAMPLES} ${HM2_MAP} 100 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} 1092 ${mu} 6 60 < ${CD}/scripts/run_1kg_analysis_chr.R
 
