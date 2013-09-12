@@ -43,8 +43,7 @@ cat("\n")
 
 ll.mat <- do.call("rbind", ll.mat)
 
-## the following is cnp'd from run_1kg_analysis_chr.R. Put it in a function. 
-
+## the following is cnp'd from run_1kg_analysis_chr.R.
 ## estimate densities, by population.
 populations <- sort(unique(pop.map))
 npop <- length(populations)             #14
@@ -63,32 +62,4 @@ for(i in 1:(npop)){
 }
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-within.list <- list()
-for(i in 1:npop){
-  within.list[[i]] <- densities[[i]][[i]]
-}
-names(within.list) <- populations
-if(plots){pdf(paste(res.dir, "/within.pdf", sep=""))}else{dev.new()}
-plot.densities(within.list, logt.grid, cols=pop.cols[populations], xlim=c(1,5), ylim=c(0,2.5), main="Within")
-if(plots){dev.off()}
-
-for(i in 1:npop){
-  between.list <- list()
-  for(j in 1:npop){
-    between.list[[j]] <- densities[[i]][[j]]
-  }
-  names(between.list) <- populations
-
-  if(plots){pdf(paste(res.dir, "/between_", populations[i], ".pdf", sep=""))}else{dev.new()}
-  plot.densities(between.list, logt.grid, cols=pop.cols[populations], xlim=c(1,5), ylim=c(0,2.5), main=populations[i])
-  if(plots){dev.off()}
-}
-
-medians <- matrix(0, npop, npop)
-for(i in 1:npop){
-  for(j in 1:npop){
-    medians[i,j] <- 10^quantile.density(densities[[i]][[j]], 0.5)
-  }
-}
-colnames(medians) <- rownames(medians) <- populations
-write.table(medians, paste(res.dir, "/medians.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,4), ylim=c(0,3) )

@@ -153,3 +153,52 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 
   return(optimize(ff, interval=c(lower,upper))$minimum) 
 }
+
+############################################################################################################################
+## Make summary plots of densities and report quantiles. 
+## densities: a list of lists where the [[i]][[j]] entry is the density of i-j chunks
+## populations: names of populations
+## pop.cols: population colours, named vector
+## res.dir: directory to output results. if NULL then open windows. 
+############################################################################################################################
+
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, ...){
+  plots <- !is.null(res.dir)
+  npop <- length(populations)
+  
+  within.list <- list()
+  for(i in 1:npop){
+    within.list[[i]] <- densities[[i]][[i]]
+  }
+  names(within.list) <- populations
+  if(plots){pdf(paste(res.dir, "/within.pdf", sep=""))}else{dev.new()}
+  plot.densities(within.list, logt.grid, cols=pop.cols[populations], main="Within", ...)
+  if(plots){dev.off()}
+  
+  for(i in 1:npop){
+    between.list <- list()
+  for(j in 1:npop){
+    between.list[[j]] <- densities[[i]][[j]]
+  }
+    names(between.list) <- populations
+
+    if(plots){pdf(paste(res.dir, "/between_", populations[i], ".pdf", sep=""))}else{dev.new()}
+    plot.densities(between.list, logt.grid, cols=pop.cols[populations], main=populations[i], ...)
+    if(plots){dev.off()}
+  }
+
+  if(plots){                            #save tables of quantiles. 
+    qs <- c(0.05, 0.5, 0.95)
+    for(q in qs){
+      res <- matrix(0, npop, npop)
+      for(i in 1:npop){
+        for(j in 1:npop){
+          res[i,j] <- 10^quantile.density(densities[[i]][[j]], q)
+        }
+      }
+      
+      colnames(res) <- rownames(res) <- populations
+      write.table(res, paste(res.dir, "/q", round(q*100), ".txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+    }
+  }
+}
