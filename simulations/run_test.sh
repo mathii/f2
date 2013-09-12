@@ -14,8 +14,6 @@
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=~/f2/simulations/test
-# Where is the recombination map, in impute format?
-HM2_MAP=~/f2/f2_age/test/constant_map.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
@@ -34,6 +32,8 @@ TH=${SIMS_DIR}/haplotypes
 RD=${SIMS_DIR}/results
 MD=${SIMS_DIR}/map
 CD=${CODE_DIR}
+# Where is the recombination map, in impute format?
+HM2_MAP=${CD}/test/constant_map.txt.gz
 
 for dir in ${WD} ${TH}/by_sample ${RD} ${MD}
 do
