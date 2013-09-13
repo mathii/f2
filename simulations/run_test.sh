@@ -18,7 +18,7 @@ SIMS_DIR=~/f2/simulations/test
 CODE_DIR=~/f2/f2_age
 
 # Parameters: size of region,number of hapotypes, Ne, estimated power 
-nbp=1000000
+nbp=10000000
 nhp=100
 ne=10000
 dbp=0.66
@@ -81,6 +81,6 @@ gzip -f ${RD}/f2_haplotypes.txt
 
 # 7) Compare haplotpyes and compute power, then compare estimates of time. 
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${ne} ${dbp} ${MD}/cut.map.txt ${nhp} < ${CD}/scripts/compare_haplotypes.R
-gzip ${RD}/matched_haps.txt
+gzip -f ${RD}/matched_haps.txt
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${TH}/samples.txt ${MD}/cut.map.txt 20 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
 R --vanilla --quiet --slave --args ${CD} ${RD} ${ne} ${nhp} ${mu} 6 60 < ${CD}/scripts/compare_estimates.R

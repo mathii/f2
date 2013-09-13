@@ -2,7 +2,7 @@
 
 #This is the same as run_simple_simulation.sh, except it takes an argument for which chromosome you want 
 # to run on and the lengt. so see the comments for that file and run this like ./run_simple_chr.sh 22 60e6 etc... 
-# Then, to run on all chromosomes, edit the entries below to point where you want, and run run_simple_all.sh
+# Then, to run on all chromosomes, edit the entries below to point where you want, and run run_all.sh
 # which will run this for chrs 1...22 and then run some additional scripts to consolidate the results. 
 
 ##############################################################################################################
@@ -51,7 +51,7 @@ sleep ${sleep_time}
 
 # redirect output to logfile                                                                                                                                   
 LOG=${RD}/log.txt
-exec > ${LOG} 2>&1
+# exec > ${LOG} 2>&1
 
 # compound params
 theta=`echo "4*$ne*$mu" | bc`
@@ -69,13 +69,13 @@ simple)
 complex)
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-	    -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.1 2 1 -T 2> \
+	    -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.01 2 1 -T 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
 	    | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
 expanding)
         ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -eN 0 10 -G 23.026 -eN 0.1 1 -T 2> \
+            -h 1e3 -R ${MD}/map.txt -eN 0 1 -G 10 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
