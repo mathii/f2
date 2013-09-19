@@ -16,10 +16,12 @@ if(length(args)==3){
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-chrs <- 1:22
+source(paste(code.dir, "/analysis/1kgsetup.R", sep=""))
+chrs <- c(1:22)
 
 ######################################################################################################
 
+haps <- list()
 ll.mat <- list()
 subenv <- new.env()
 logt.grid=NULL
@@ -32,6 +34,10 @@ for(chr in chrs){
   load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
   ll.mat[[i]] <- subenv$ll.mat
 
+  haps[[i]] <- subenv$haps
+
+  if(NROW(ll.mat[[i]])!=NROW(haps[[i]])){stop(paste0("Error in chr", chr))}
+  
   if(i==1){
     logt.grid <- subenv$logt.grid
   }else if (!all(subenv$logt.grid==logt.grid)){
@@ -42,6 +48,7 @@ for(chr in chrs){
 cat("\n")
 
 ll.mat <- do.call("rbind", ll.mat)
+haps <- do.call("rbind", haps)
 
 ## the following is cnp'd from run_1kg_analysis_chr.R.
 ## estimate densities, by population.
@@ -61,5 +68,9 @@ for(i in 1:(npop)){
   }
 }
 
+l.o <- c("ASW", "LWK", "YRI", "CLM", "MXL", "PUR",  "CHB", "CHS", "JPT", "CEU", "FIN", "GBR", "IBS", "TSI")
+legend.order=order(match(populations, l.o))
+
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,4), ylim=c(0,3) )
+density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(0,4), ylim=c(0,4), legend.order=legend.order )
+haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)
