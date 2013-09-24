@@ -102,3 +102,31 @@ if(plots){dev.off()}
 if(plots){pdf(paste(res.dir, "/coverage.pdf", sep=""), height=6, width=6)}else{dev.new()}
 plot.coverage.curves(matched$Age, t.hats, labels=labels, lty=rep(1,6), lwd=1, cols=c("black", brewer.pal(5, "Set1")))
 if(plots){dev.off()}
+
+## Now do confidence intervals.
+cis <- c(0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+lower <- matrix(0, nrow=NROW(matched), ncol=length(cis))
+upper <- matrix(0, nrow=NROW(matched), ncol=length(cis))
+for(i in 1:length(cis)){
+  for(j in 1:NROW(matched)){
+    cat(paste0("\r",i, ":", j))
+    ci <- confidence.interval( Lg=matched$map.len[j],  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=error.params, S.params=S.params[j,], alpha=cis[i], max.search=10)
+    lower[j,i] <- ci[1]
+    upper[j,i] <- ci[2]
+  }
+}
+
+gt.lower <- 0*lower
+lt.upper <- 0*upper
+
+for(i in 1:length(cis)){
+  gt.lower[,i] <- matched$Age>lower[,i]
+  lt.upper[,i] <- matched$Age<upper[,i]
+
+}
+probs <- colMeans(gt.lower&lt.upper)
+
+if(plots){pdf(paste(res.dir, "/CI_coverage.pdf", sep=""), height=6, width=6)}else{dev.new()}
+plot(c(0,1), c(0,1), lwd=2, lty=2, type="l", col="grey80", bty="n", xlab=expression(alpha), ylab=expression(Empirical~alpha~CI))
+lines(cis, probs, type="b", col="#e41a1c",lwd=2, pch=16)
+if(plots){dev.off()}

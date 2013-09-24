@@ -12,15 +12,17 @@ library(MASS)
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
 ########################################################################################################
 
-loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA){
+loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.7){
   inner <- function(x){return(NA)}
   t1 <- 0
   
   if(all(is.na(error.params))){
-    t1 <- (dgamma(Lg, shape=1+1/D, rate=4*Ne*t*pf(t), log=TRUE))
+    ## t1 <- (dgamma(Lg, shape=1+1/D, rate=4*Ne*t*pf(t), log=TRUE))
+    t1 <- (dgamma(Lg, shape=shape, rate=4*Ne*t*pf(t), log=TRUE))
   } else{
     inner <- function(x){
-      dgamma(x, shape=1+1/D, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
+      ## dgamma(x, shape=1+1/D, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
+      dgamma(x, shape=shape, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
     }
     ## This is to ensure that we are not integrating over large zero regions
     upper=max(0,Lg-1e-6)                #the 1e-6 is because when shape<0 the gamma dist is not defined at x=0
@@ -94,7 +96,7 @@ make.pnfn <- function(n, t.grid=c((1:10)/10, 2:10)){
 ## verbose: report progress
 ########################################################################################################
 
-compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params=NA, S.params=NA, verbose=FALSE){
+compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params=NA, S.params=NA, verbose=FALSE, shape=1.7){
   ll.mat <- matrix(0, nrow=length(Lgs), ncol=length(logt.grid))
   
   for(i in 1:length(Lgs)){
@@ -102,7 +104,7 @@ compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params
       if(verbose){cat(paste("\r", i, j))}
       s.p <- NA
       if(!all(is.na(S.params))){s.p <- S.params[i,]}
-      ll.mat[i,j] <- loglikelihood.age(t=(10^(logt.grid[j]))/2/Ne, Lg=Lgs[i], D=Ds[i], Ne=Ne, pf=pf,  error.params=error.params, S.params=s.p)
+      ll.mat[i,j] <- loglikelihood.age(t=(10^(logt.grid[j]))/2/Ne, Lg=Lgs[i], D=Ds[i], Ne=Ne, pf=pf,  error.params=error.params, S.params=s.p, shape=shape)
     }
   }
   if(verbose){cat("\n")}
@@ -240,3 +242,27 @@ wedding.cake.ratio <- function(i,n){
 ########################################################################################################
 
 norm.2.p <- function(x){return(dnorm(x, mean=2))}
+
+########################################################################################################
+## Get confidence interval - approximate two sided confidence interval
+## using full likelihood
+########################################################################################################
+
+confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, max.search=10){
+  opt <- optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
+
+  mle <- opt$maximum
+  max.ll <- opt$objective
+  
+  mle.diff <- qchisq(alpha, df=1, lower.tail=TRUE)/2
+
+  ll.diff <- function(t){
+    ll <- loglikelihood.age(t, Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
+    return((max.ll-ll-mle.diff)^2)
+  }
+  
+  lower <- optimize( ll.diff, interval=c(0,mle) )$minimum
+  upper <- optimize( ll.diff, interval=c(mle,max.search) )$minimum
+  
+  return(2*Ne*c(lower, upper))
+}
