@@ -24,7 +24,7 @@ CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
 ne=18000
-mu=0.000000012
+mu=0.000000004
 
 ##############################################################################################################
 
