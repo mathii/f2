@@ -135,8 +135,8 @@ estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbos
   }
   f.mat <- exp(ll.mat)
   for(i in 1:NROW(f.mat)){
-    if(all(f.mat[i,]==0)){
-      f.mat[i,] <- 1
+    if(all(f.mat[i,,drop=FALSE]==0)){
+      f.mat[i,,drop=FALSE] <- 1
     }
   }  
 

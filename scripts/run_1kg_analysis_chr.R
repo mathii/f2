@@ -66,12 +66,12 @@ ID2.pop <- pop.map[haps$ID2]
 for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
-    if(sum(include)>0){
-      alpha <- round(0.05*sum(include))
+    if(sum(include)>1){
+      alpha <- max(1,round(0.05*sum(include)))
       dens <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[include,])
       densities[[i]][[j]] <- densities[[j]][[i]] <- dens
     }else{
-      densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0)}
+      densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0*x)}
     }
   }
 }
