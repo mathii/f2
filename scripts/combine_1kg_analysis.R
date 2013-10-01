@@ -72,5 +72,5 @@ l.o <- c("ASW", "LWK", "YRI", "CLM", "MXL", "PUR",  "CHB", "CHS", "JPT", "CEU", 
 legend.order=order(match(populations, l.o))
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(0,4), ylim=c(0,4), legend.order=legend.order )
+density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(0,5), ylim=c(0,5), legend.order=legend.order )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)

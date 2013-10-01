@@ -85,3 +85,7 @@ if(plots){dev.off()}
 if(plots){pdf(paste(res.dir, "/coverage.pdf", sep=""), height=6, width=6)}else{dev.new()}
 plot.coverage.curves(matched$Age, t.hats, labels=labels, lty=rep(1,6), lwd=1, cols=c("black", brewer.pal(5, "Set1")))
 if(plots){dev.off()}
+
+## Used these plot for illustration of the effect of using S. 
+## plot.mle.and.density(matched$Age, t.hats[,3], denss[[3]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log), cex=2, alpha="10")
+## plot.mle.and.density(matched$Age, t.hats[,6], denss[[6]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log), cex=2, alpha="10")
