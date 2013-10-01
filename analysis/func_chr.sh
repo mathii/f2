@@ -45,24 +45,28 @@ theta=`echo "4*$ne*$mu" | bc`
 
 for func in lof coding noncoding
 do
+    echo ${func}
     FTH=${SIMS_DIR}/${func}/haplotypes
-    FRD=${SIMS_DIR}${func}/results
+    FRD=${SIMS_DIR}/${func}/results
 # 1) Sequence data - doubletons from sequences filted by functional class. 
     ${VCFTOOLS} --gzvcf ${path_to_seq_data} --out ${FTH}/chr${CHR}.f2.log.tmp \
         --recode-to-stream --mac 2 --max-mac 2 --positions ${PATH_TO_FUNC}/ALL_${func}_pos.txt.gz | grep -v "^#" \
         | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
         | gzip -c > ${FTH}/chr${CHR}.f2.haps.gz
 
-    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f2.haps.gz -o ${FTH}/pos.idx.f${n}.gz -n $n > ${FTH}/pos.idx.f2.tmp.log 
+    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f2.haps.gz -o ${FTH}/pos.idx.f2.gz -n 2 > ${FTH}/pos.idx.f2.tmp.log 
+    ln -sf ${TH}/pos.idx.f1.gz ${FTH}/pos.idx.f1.gz # symlink to singletons
+    ln -sf ${TH}/by_sample ${FTH}/by_sample
+    ln -sf ${TH}/samples.txt ${FTH}/samples.txt
 
 # 2) Find f2 haplotypes
-    cp ${CD}/analysis/1092_phase1_samples.txt ${FTH}/samples.txt
     R --vanilla --quiet --slave --args ${CD} ${FTH} ${FRD}/f2_haplotypes.txt ${HM2_MAP} 0 < ${CD}/scripts/haplotypes_from_f2.R
     gzip -f ${FRD}/f2_haplotypes.txt 
 
 # 3) Estimate distributions
-    
-    R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${SAMPLES} ${HM2_MAP} 100 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
+    ln -sf ${RD}/error_params.txt ${FRD}/error_params.txt
+    ln -sf ${RD}/theta_estimates.txt ${FRD}/theta_estimates.txt
+
     R --vanilla --quiet --slave --args ${CD} ${FRD} ${ne} 1092 ${mu} 6 60 < ${CD}/scripts/run_1kg_analysis_chr.R
 done
 
