@@ -43,18 +43,23 @@ LOG=${RD}/log.txt
 exec > ${LOG} 2>&1                                                                                                                                        
 theta=`echo "4*$ne*$mu" | bc`
 
+sleep ${CHR} # just so we don't all start at the same time
 for func in lof coding noncoding
 do
     echo ${func}
     FTH=${SIMS_DIR}/${func}/haplotypes
     FRD=${SIMS_DIR}/${func}/results
 # 1) Sequence data - doubletons from sequences filted by functional class. 
+    cp ${PATH_TO_FUNC}/ALL_${func}_pos.txt.gz ${FTH}/sites.txt.gz # copy the file to avoid disk blocking
     ${VCFTOOLS} --gzvcf ${path_to_seq_data} --out ${FTH}/chr${CHR}.f2.log.tmp \
-        --recode-to-stream --mac 2 --max-mac 2 --positions ${PATH_TO_FUNC}/ALL_${func}_pos.txt.gz | grep -v "^#" \
+        --recode-to-stream --mac 2 --max-mac 2 --positions ${FTH}/sites.txt.gz | grep -v "^#" \
         | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
         | gzip -c > ${FTH}/chr${CHR}.f2.haps.gz
+    rm ${FTH}/sites.txt.gz
 
-    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f2.haps.gz -o ${FTH}/pos.idx.f2.gz -n 2 > ${FTH}/pos.idx.f2.tmp.log 
+
+    # Now find haplotypes and link the things that need to be linked. 
+    python ${CD}/scripts/calculate_fn_sites.py -h ${FTH}/chr${CHR}.f2.haps.gz -o ${FTH}/pos.idx.f2.gz -n 2 > ${FTH}/pos.idx.f2.tmp.log 
     ln -sf ${TH}/pos.idx.f1.gz ${FTH}/pos.idx.f1.gz # symlink to singletons
     ln -sf ${TH}/by_sample ${FTH}/by_sample
     ln -sf ${TH}/samples.txt ${FTH}/samples.txt
