@@ -64,6 +64,7 @@ for( cls in classes){
 ## estimate densities, by class for within/between.
 densities <- rep(list(list()),3)
 
+i=1
 for(cls in classes){
   haps <- haps.by.class[[cls]]
   ll.mat <- ll.mats.by.class[[cls]]
@@ -80,8 +81,9 @@ for(cls in classes){
   dens.w <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.w,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[within,])
   dens.b <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.b,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[between,])
   
-    densities[[cls]][["within"]] <- dens.w
-    densities[[cls]][["between"]] <- dens.b    
+  densities[[i]][["within"]] <- dens.w
+  densities[[i]][["between"]] <- dens.b
+  i=i+1
 }
 
 q5 <- q50 <- q95 <- matrix(0,nrow=2,ncol=3)
