@@ -1,6 +1,6 @@
 ## Plot the median by chromosome. See if they vary...
-code.dir <- "~/f2/code/"
-path.to.results <- "~/f2/results/"
+code.dir <- "~/f2_age/code/"
+path.to.results <- "~/f2_age/1000g/results/"
 source(paste0(code.dir, "analysis/1kgsetup.R"))
 
 within <- matrix(0,14,22)

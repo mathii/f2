@@ -57,7 +57,7 @@ npop <- length(populations)             #14
 densities <- rep(list(list()),npop)
 
 ID1.pop <- pop.map[haps$ID1]
-ID2.pop <- pop.map[haps$ID2]
+ID2.pop <- pop.map[haps$ID2]s$hap
 for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
@@ -74,3 +74,5 @@ legend.order=order(match(populations, l.o))
 ## plots. One plot of all within-group densities, and one of all densities in total.
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(0,5), ylim=c(0,5), legend.order=legend.order )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)
+
+populations <- c( "CEU", "GBR", "FIN", "TSI", "IBS", "MXL", "CLM", "PUR")
