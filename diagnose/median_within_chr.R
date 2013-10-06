@@ -31,10 +31,11 @@ for(k in 1:length(chrs)){
 }
 
 cols <- rainbow(length(chrs))
+## cols <- c("red", "blue")
 plot(bins.l, medians[1,], type="s", xlab="Position", ylab="Median", bty="n", col=cols[1], ylim=c(2.1,2.4), xlim=c(0,150e6))
 if(length(chrs)>1){
   for(j in 2:length(chrs)){
     lines(bins.l, medians[j,], type="s", col=cols[j])
   }
 }
-legend("topright", paste0("Chromosome ", chrs), col=cols, lty=1, bty="n")
+legend("topleft", paste0("Chromosome ", chrs), col=cols, lty=1, bty="n")
