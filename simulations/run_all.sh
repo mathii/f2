@@ -6,14 +6,14 @@
 
 ##############################################################################################################
 
+# What type of simulation to run
+sim_type=expanding
 # Where are the simulation results. Should be of the form SIMS_ROOT/chr${CHR}/ where chr runs from 1 to 22
-SIMS_ROOT=~/f2/simulations/simple/
+SIMS_ROOT=/data1/users/mathii/f2_sims/${sim_type}/
 # Where is the code - this should point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 # How many parallel processes?
 N_PROCS=22
-# What type of simulation to run
-sim_type=simple
 
 ##############################################################################################################
 

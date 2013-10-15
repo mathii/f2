@@ -45,37 +45,37 @@ theta=`echo "4*$ne*$mu" | bc`
 # 1) Parse data into correct format 
 # 1.1) Chip data
 # set max number of file descriptors
-ulimit -n 1200
+#ulimit -n 1200
 # Keep only the Phase 1 samples
-${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
-    --out ${TH}/chr${CHR}.1092.tmp --recode-to-stream | gzip -c > ${TH}/chr${CHR}.1092.tmp.vcf.gz
+#${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${SAMPLES} \
+#    --out ${TH}/chr${CHR}.1092.tmp --recode-to-stream | gzip -c > ${TH}/chr${CHR}.1092.tmp.vcf.gz
 # Convert to flat format
-zgrep -v "^#" ${TH}/chr${CHR}.1092.tmp.vcf.gz \
-    | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
-    | gzip -c > ${TH}/all.chr${CHR}.chip.haps.gz
+#zgrep -v "^#" ${TH}/chr${CHR}.1092.tmp.vcf.gz \
+#    | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
+#    | gzip -c > ${TH}/all.chr${CHR}.chip.haps.gz
 # Split up by sample. 
-python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/all.chr${CHR}.chip.haps.gz -o ${TH}/by_sample/ -s ${SAMPLES}
+#python ${CD}/scripts/haps_to_gt_bysample.py -h ${TH}/all.chr${CHR}.chip.haps.gz -o ${TH}/by_sample/ -s ${SAMPLES}
 # Cleanup
-rm ${TH}/chr${CHR}.1092.tmp.log
-rm ${TH}/chr${CHR}.1092.tmp.vcf.gz
-rm ${TH}/all.chr${CHR}.chip.haps.gz
+#rm ${TH}/chr${CHR}.1092.tmp.log
+#rm ${TH}/chr${CHR}.1092.tmp.vcf.gz
+#rm ${TH}/all.chr${CHR}.chip.haps.gz
 
 # 1.2) Sequence data - extract singletons and doubletons
-for n in 1 2
-do
-    ${VCFTOOLS} --gzvcf ${path_to_seq_data}  --out ${TH}/chr${CHR}.f${n}.log.tmp \
-        --recode-to-stream --mac $n --max-mac $n | grep -v "^#" \
-        | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
-        | gzip -c > ${TH}/chr${CHR}.f${n}.haps.gz
+#for n in 1 2
+#do
+#    ${VCFTOOLS} --gzvcf ${path_to_seq_data}  --out ${TH}/chr${CHR}.f${n}.log.tmp \
+#        --recode-to-stream --mac $n --max-mac $n | grep -v "^#" \
+#        | awk '{{printf "%d",$2};for(i=10; i<=NF; i++){printf "\t%d\t%d",substr($i,1,1),substr($i,3,1)};printf "\n"}'  \
+#        | gzip -c > ${TH}/chr${CHR}.f${n}.haps.gz
 
-    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f${n}.haps.gz -o ${TH}/pos.idx.f${n}.gz -n $n > ${TH}/pos.idx.f${n}.tmp.log 
-done
+#    python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/chr${CHR}.f${n}.haps.gz -o ${TH}/pos.idx.f${n}.gz -n $n > ${TH}/pos.idx.f${n}.tmp.log 
+#done
 
 
 # 2) Find f2 haplotypes
-cp ${CD}/analysis/1092_phase1_samples.txt ${TH}/samples.txt
-R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${HM2_MAP} 0 < ${CD}/scripts/haplotypes_from_f2.R
-gzip -f ${RD}/f2_haplotypes.txt 
+#cp ${CD}/analysis/1092_phase1_samples.txt ${TH}/samples.txt
+#R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt ${HM2_MAP} 0 < ${CD}/scripts/haplotypes_from_f2.R
+#gzip -f ${RD}/f2_haplotypes.txt 
 
 # 3) Estimate distributions
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} ${SAMPLES} ${HM2_MAP} 100 100 two.way ${nbp} < ${CD}/scripts/estimate_error_parameters.R
