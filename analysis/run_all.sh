@@ -35,11 +35,11 @@ do
     echo "$CODE_DIR/analysis/func_chr.sh ${CHR} ${seq_path} ${chip_path} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_func_args
 done
 
-xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
+#xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
 xargs --arg-file=${SIMS_ROOT}/tmp_func_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
 rm ${SIMS_ROOT}/tmp_args
 rm ${SIMS_ROOT}/tmp_func_args
 
 # Now run script to combine results across chromosomes
-mkdir -p ${SIMS_ROOT}/all
-R --vanilla --slave --quiet --args  ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} < ${CODE_DIR}/scripts/combine_1kg_analysis.R
+#mkdir -p ${SIMS_ROOT}/all
+#R --vanilla --slave --quiet --args  ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} < ${CODE_DIR}/scripts/combine_1kg_analysis.R

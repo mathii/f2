@@ -19,7 +19,7 @@ sleep_time=$4
 # where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
-SIMS_DIR=~/f2/simulations/${sim_type}/chr${CHR}
+SIMS_DIR=/data1/users/mathii/f2_sims/${sim_type}/chr${CHR}
 # Where is the recombination map, in impute format?
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
@@ -97,6 +97,33 @@ recent_split)
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+recent_split_migration)
+        nhp=`echo "$nhp1+$nhp2" | bc`
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ma x 400 400 x -ej 0.01 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+        ;;
+bottleneck)
+        ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -eN 0.00025 0.01 -eN 0.0003 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+Ne_10)
+	theta10=`echo "4*10*$ne*$mu" | bc`
+	rho10=`echo "4*10*$ne*0.00000001" | bc`
+        ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta10} -r ${rho10} -h 1e3 -R ${MD}/map.txt 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+        ;;
+Ne_01)
+        theta01=`echo "4*0.1*$ne*$mu" | bc`
+        rho01=`echo "4*0.1*$ne*0.00000001" | bc`
+        ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta01} -r ${rho01} -h 1e3 -R ${MD}/map.txt 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+        ;;
 esac
 
 # 3)Parse the macs output to get trees and genotypes
