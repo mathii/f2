@@ -86,7 +86,7 @@ for(cls in classes){
   i=i+1
 }
 
-save.image(paste0(chr.res.dir, "/all/ll_environment.Rdata"))
+save.image(paste0(res.dir, /ll_environment.Rdata"))
 
 q5 <- q50 <- q95 <- matrix(0,nrow=2,ncol=3)
 
