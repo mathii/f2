@@ -86,7 +86,14 @@ expanding)
 ancient_split)
 	nhp=`echo "$nhp1+$nhp2" | bc`
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -ej 0.1 2 1 -T 2> \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+ancient_split_migration)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.01 2 x 56 56 x -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
