@@ -57,7 +57,7 @@ npop <- length(populations)             #14
 densities <- rep(list(list()),npop)
 
 ID1.pop <- pop.map[haps$ID1]
-ID2.pop <- pop.map[haps$ID2]s$hap
+ID2.pop <- pop.map[haps$ID2]
 for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])

@@ -112,3 +112,4 @@ axis(1, at=c(1:6), labels=c("LOF", "coding", "noncoding", "LOF", "coding", "nonc
 legend("topleft", c("Within", "Between"), col=c("blue", "red"), pch=16, bty="n")
 abline(v=3.5, lty=3)
 dev.off()
+
