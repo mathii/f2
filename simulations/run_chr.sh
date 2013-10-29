@@ -113,6 +113,7 @@ bottleneck)
 Ne_10)
 	theta10=`echo "4*10*$ne*$mu" | bc`
 	rho10=`echo "4*10*$ne*0.00000001" | bc`
+	#note that you need to manually scale the true ages by 0.1 later if you  do this	
         ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta10} -r ${rho10} -h 1e3 -R ${MD}/map.txt 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
@@ -120,6 +121,7 @@ Ne_10)
 Ne_01)
         theta01=`echo "4*0.1*$ne*$mu" | bc`
         rho01=`echo "4*0.1*$ne*0.00000001" | bc`
+        #note that you need to manually scale the true ages by 0.1 later if you  do this
         ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta01} -r ${rho01} -h 1e3 -R ${MD}/map.txt 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
