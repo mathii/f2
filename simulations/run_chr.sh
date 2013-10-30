@@ -81,7 +81,10 @@ expanding)
 	;;
 ss_test)
 	ne=20000
-	${MACS_DIR}/macs ${nhp} ${nbp} -t 0.001 -r 0.0004 -I 2 ${nhp1} ${nhp2} -ej .0041 2 1
+	${MACS_DIR}/macs ${nhp} ${nbp} -t 0.001 -r 0.0004 -I 2 ${nhp1} ${nhp2} \
+	    -ej .0041 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 ;;
 bottleneck)
 	echo "bottleneck 15" > $RD/events.txt
