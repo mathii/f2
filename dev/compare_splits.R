@@ -83,7 +83,7 @@ da.b <- estimate.t.density.mcmc(0*matched$map.len[between,] ,0*matched$f2[within
 
 dad <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mats[[6]])
 
-pdf("~/f2_age/talk/figures/dirty_split_density.pdf")
+pdf("~/f2_age/simulations/ancient_split_migration/chr20/results/density.pdf")
 plot(logt.grid, da.w(logt.grid), col="#377EBA", type="l", bty="n", xlim=c(0,4), ylim=c(0,2), xlab=expression(Age~(log[10]~generations)), ylab="Density")
 lines(logt.grid, da.b(logt.grid), col="#E41A1C")
 legend("topleft", c("Within", "Between", "Migration time"), col=c("#377EBA", "#E41A1C", "black"), lty=c(1,1,3), bty="n")
