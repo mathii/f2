@@ -60,6 +60,9 @@ rho=`echo "4*$ne*0.00000001" | bc`
 # 1) convert hms map to macs format
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
+echo $nhp > $RD/groups.txt
+echo "NA" > $RD/events.txt
+
 # 2) Simulate using macs 
 case $sim_type in
 simple)
@@ -70,57 +73,41 @@ constant_rate)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${CD}/test/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
-complex)
-	nhp=`echo "$nhp1+$nhp2" | bc`
-	${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-	    -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.01 2 1 -T 2> \
-	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
-	    | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-	;;
 expanding)
         ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -eN 0 1 -G 10 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
-ancient_split)
-	nhp=`echo "$nhp1+$nhp2" | bc`
-        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -T 2> \
-            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
-            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-	;;
-ancient_split_migration)
-	nhp=`echo "$nhp1+$nhp2" | bc`
-        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.01 2 x 560 560 x -T 2> \
-            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
-            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-	;;
-recent_split)
-	nhp=`echo "$nhp1+$nhp2" | bc`
-        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -ej 0.01 2 1 -T 2> \
-            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
-            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-	;;
-recent_split_migration)
-        nhp=`echo "$nhp1+$nhp2" | bc`
-        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt -ma x 400 400 x -ej 0.01 2 1 -T 2> \
-            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
-            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-        ;;
+ss_test)
+	ne=20000
+	${MACS_DIR}/macs ${nhp} ${nbp} -t 0.001 -r 0.0004 -I 2 ${nhp1} ${nhp2} -ej .0041 2 1
+;;
 bottleneck)
+	echo "bottleneck 15" > $RD/events.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -eN 0.00025 0.01 -eN 0.0003 1 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+schaffner)
+	nhp=400
+	ne=100000
+	python ${CD}/scripts/schaffner.py $nhp $nbp  \
+	    ${MD}/map.txt 12345 ${WD} ${MACS_DIR}
+;;
+complex)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 560" > $RD/events.txt
+	${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+	    -h 1e3 -R ${MD}/map.txt -n 2 10 -g 2 23.026 -ej 0.01 2 1 -T 2> \
+	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+	    | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
 Ne_10)
 	theta10=`echo "4*10*$ne*$mu" | bc`
 	rho10=`echo "4*10*$ne*0.00000001" | bc`
-	#note that you need to manually scale the true ages by 0.1 later if you  do this	
         ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta10} -r ${rho10} -h 1e3 -R ${MD}/map.txt 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
@@ -128,8 +115,43 @@ Ne_10)
 Ne_01)
         theta01=`echo "4*0.1*$ne*$mu" | bc`
         rho01=`echo "4*0.1*$ne*0.00000001" | bc`
-        #note that you need to manually scale the true ages by 0.1 later if you  do this
         ${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta01} -r ${rho01} -h 1e3 -R ${MD}/map.txt 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+        ;;
+ancient_split)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 1120" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+ancient_split_migration)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 1120" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.01 2 x 560 560 x -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+recent_split)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 560" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.01 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+recent_split_migration)
+        nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 560" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ma x 400 400 x -ej 0.01 2 1 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
         ;;
