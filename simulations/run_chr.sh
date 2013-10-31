@@ -140,6 +140,25 @@ ancient_split_migration)
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+ancient_split_long_migration)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 1120" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.004 2 x 560 560 x -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+ancient_split_long_decreasing_migration)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+	echo "split 1120" > $RD/events.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.004 2 x 140 140 x \
+	    -ema 0.006 2 x 280 280 x -ema 0.008 2 x 420 420 x -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
 recent_split)
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
