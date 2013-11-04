@@ -8,10 +8,10 @@ def parse_options():
     """
     File paths and indices (comma separated)
     """
-    options ={ "macs_data_dir":"", "p0_indices":"", "p1_indices":"", "seq_len":0  , "chr":"chr"}
+    options ={ "macs_data_dir":"", "p0_indices":"", "p1_indices":"", "seq_len":0  , "chr":"chr", "output_suffix":""}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:0:1:s:c:", ["dir", "p0", "p1", "len", "chr"])
+        opts, args = getopt.getopt(sys.argv[1:], "d:0:1:s:c:o:", ["dir", "p0", "p1", "len", "chr", "os"])
     except Exception as err:
         print str(err)
         sys.exit()
@@ -22,6 +22,7 @@ def parse_options():
         elif o in ["-1","--p1"]:      options["p1_indices"] = [int(x) for x in a.split(",")]
         elif o in ["-s","--seq_len"]: options["seq_len"] = int(a)
         elif o in ["-c","--chr"]: options["chr"] = a
+        elif o in ["-o","--os"]: options["output_suffix"] = a
 
     print "found options:"
     print options
@@ -70,7 +71,7 @@ def main(options):
     p0_haps=p0_haps[:,seg_sites]
     p1_haps=p1_haps[:,seg_sites]
 
-    out_file=open(options["macs_data_dir"]+"/msmc_input.txt", "w")
+    out_file=open(options["macs_data_dir"]+"/msmc_input"+options["output_suffix"]+".txt", "w")
     last_pos=0
     for i in xrange(sum(seg_sites)):
         if pos[i]==last_pos:            # only one variant per site
