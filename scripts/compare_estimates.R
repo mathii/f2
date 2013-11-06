@@ -44,7 +44,7 @@ if(!file.exists( paste(res.dir, "/matched_haps.txt.gz", sep=""))){
   matched <- read.table(paste(res.dir, "/f2_haplotypes.txt.gz", sep=""),  as.is=TRUE, header=TRUE)
   matched$hap.len <- matched$hap.right-matched$hap.left
   matched <- matched[matched$ID1!=matched$ID2,]
-  matched <- matched[matched$true.map>0,]      
+  matched <- matched[matched$map.len>0,]      
   ll.mats <- list()
   S.params <- matched[,c("f1", "hap.len")]
   names(S.params) <- c("S", "Lp")
