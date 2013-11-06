@@ -29,13 +29,34 @@ if(length(args)==7){
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-matched <- read.table(paste(res.dir, "/matched_haps.txt.gz", sep=""), as.is=TRUE, header=TRUE)
 error.params <- scan(paste(res.dir, "error_params.txt", sep="/"), quiet=TRUE)
 theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TRUE)
-
 ######################################################################################################
 
 p.fun <- function(t){return(1)}
+logt.grid <- seq(0, max.log, length.out=bins)
+
+######################################################################################################
+
+matched <- NA
+if(!file.exists( paste(res.dir, "/matched_haps.txt.gz", sep=""))){
+  cat("Salvaging likelihood\n")
+  matched <- read.table(paste(res.dir, "/f2_haplotypes.txt.gz", sep=""),  as.is=TRUE, header=TRUE)
+  matched$hap.len <- matched$hap.right-matched$hap.left
+  matched <- matched[matched$ID1!=matched$ID2,]
+  matched <- matched[matched$true.map>0,]      
+  ll.mats <- list()
+  S.params <- matched[,c("f1", "hap.len")]
+  names(S.params) <- c("S", "Lp")
+  S.params$theta <- 4*Ne*mu
+  S.params$Ep <- S.params$Lp*(theta.estimates[matched$ID1]+theta.estimates[matched$ID2])
+  ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
+  save.image(paste(res.dir, "/ll_and_density_environment.Rdata", sep=""))
+}
+matched <- read.table(paste(res.dir, "/matched_haps.txt.gz", sep=""), as.is=TRUE, header=TRUE)
+
+######################################################################################################
+
 
 ## Set up singleton params
 t.hats <- matrix(0, nrow=NROW(matched), ncol=6)
@@ -74,7 +95,6 @@ norm.2.p <- function(x){return(dnorm(x, mean=2))}
 
 denss <- list()
 ll.mats <- list()
-logt.grid <- seq(0, max.log, length.out=bins)
 ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
 ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
 ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=FALSE)

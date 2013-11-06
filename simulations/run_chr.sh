@@ -179,7 +179,7 @@ third_party)
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 3 ${nhp1} ${nhp2} 0 -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt  -ej 0.0201 3 1 -ej 0.02 2 1 \
-	    -ema 0.01 3 x 0 560 0 x 560 560 560 x -T 2> \
+	    -ema 0.01 3 x 0 560 0 x 560 560 560 x 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
@@ -188,7 +188,7 @@ third_party_long)
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 3 ${nhp1} ${nhp2} 0 -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -ej 0.0201 3 1 -ej 0.02 2 1 \
-	    -ema 0.004 3 x 0 560 0 x 560 560 560 x -T 2> \
+	    -ema 0.004 3 x 0 560 0 x 560 560 560 x 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;

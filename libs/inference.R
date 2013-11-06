@@ -266,3 +266,4 @@ confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, ma
   
   return(2*Ne*c(lower, upper))
 }
+
