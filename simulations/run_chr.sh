@@ -140,6 +140,9 @@ ancient_split_migration)
 	;;
 ancient_split_migration_growth)
 	nhp=`echo "$nhp1+$nhp2" | bc`
+	ne=140000
+	theta=`echo "4*$ne*$mu" | bc`
+	rho=`echo "4*$ne*0.00000001" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt  -eN 0.0201 0.1 -ej 0.02 2 1 \
