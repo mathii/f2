@@ -11,15 +11,19 @@ bash scripts. It has been tests on MacOSX and linux, but it's unlikely
 to run as it is on any other platform. 
 
 1) R: Developed with R version 2.15. Packages required: RColorBrewer 
-(not strictly required)
+(not strictly required).
 
 2) python: 2.6 or higher. Packages required: numpy, biopython, gzip, sys, 
 getopt. Most of these are standard, but you may need to install numpy
 and certainly biopython. 
 
-3) c: tested with gcc 
+3) c: tested with gcc.
 
-4) For simulations, macs (http://code.google.com/p/macs/)
+4) For simulations, macs (http://code.google.com/p/macs/).
+
+5) For data analysis, vcftools (0.1.11). 
+
+6) Generally, standard unix utilities: awk, grep, sed, gzip and so on. 
 
 Quickstart: 
 
