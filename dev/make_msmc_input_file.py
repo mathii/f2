@@ -1,3 +1,6 @@
+# Make an msmc input file from a file called genotpyes.txt.gz, which is
+# a 01 file (ok, actually haplotypes) generated, for example, by macs. 
+
 from __future__ import division
 import gzip, sys, getopt, pdb
 import numpy as np

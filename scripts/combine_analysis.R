@@ -4,19 +4,20 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==3){
+if(length(args)==4){
   chr.res.dir <- args[1]
   res.dir <- args[2]
   code.dir <- args[3]
+  setup.file <- args[4]
   plots <- TRUE
 } else{
-  stop("Need to specify 3 arguments")
+  stop("Need to specify 4 arguments")
 }
 
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-source(paste(code.dir, "/analysis/1kgsetup.R", sep=""))
+source(setup.file)
 chrs <- c(1:22)
 
 ######################################################################################################

@@ -21,9 +21,13 @@ SIMS_DIR=/data1/users/mathii/1000g/results/chr${CHR}
 HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
+# two colum tab delim file - col1=sample name, col2=population
+PANEL=${CODE_DIR}/analysis/1kg_panel.txt
+# Setup file - see the 1kg file for an example
+SETUP_FILE=${CODE_DIR}/analysis/1kg_setup.R
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-ne=18000
+ne=185000
 mu=0.000000004
 
 ##############################################################################################################
@@ -32,7 +36,7 @@ TH=${SIMS_DIR}/haplotypes
 RD=${SIMS_DIR}/results
 CD=${CODE_DIR}
 PATH_TO_FUNC=/data1/users/mathii/1000g/data/func/ # ALL_XX_pos.txt.gz where XX=coding,noncoding and lof
-SAMPLES=${CODE_DIR}/analysis/1092_phase1_samples.txt
+
 for dir in ${SIMS_DIR}/coding ${SIMS_DIR}/noncoding ${SIMS_DIR}/lof
 do
     mkdir -p ${dir}/haplotypes
@@ -72,6 +76,7 @@ do
     ln -sf ${RD}/error_params.txt ${FRD}/error_params.txt
     ln -sf ${RD}/theta_estimates.txt ${FRD}/theta_estimates.txt
 
-    R --vanilla --quiet --slave --args ${CD} ${FRD} ${ne} 1092 ${mu} 6 60 < ${CD}/scripts/run_1kg_analysis_chr.R
+    R --vanilla --quiet --slave --args ${CD} ${FRD} ${ne} 1092 ${mu} 6 60 \
+	${SETUP_FILE} < ${CD}/scripts/run_analysis_chr.R
 done
 

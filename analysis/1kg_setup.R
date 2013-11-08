@@ -1,6 +1,10 @@
 ## Just load the colour scheme and population assignments for the 1000 Genomes data
 ## The colours are the ones used in the 1000 genomes paper. 
 
+## Actually, if you are making a new file for your own data, the only things
+## you have to define are "pop.map", which maps sample names to populations
+## and "pop.cols" which maps populations to colours. 
+
 eur<-c("GBR", "FIN", "IBS", "CEU", "TSI"); 
 asn<-c("CHS","CHB", "JPT"); 
 afr<-c("YRI", "LWK", "ASW"); 
@@ -16,7 +20,7 @@ names(cols) <- pop.list
 cols.cont<-colours()[cols.cont];
 names(cols.cont) <- cont.list
 
-panel <- read.table(paste(code.dir, "/analysis/panel.txt", sep=""), as.is=TRUE, header=FALSE, sep="\t")
+panel <- read.table(paste(code.dir, "/analysis/1kg_panel.txt", sep=""), as.is=TRUE, header=FALSE, sep="\t")
 pop.map <- panel[,2]
 names(pop.map) <- panel[,1]
 pop.cols <- cols

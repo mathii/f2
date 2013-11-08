@@ -1,0 +1,79 @@
+These directories contain various scripts for estimating the age of 
+f2 variants, as described in "Demography and the age of rare variants"
+- Mathieson & McVean, in preparation. This is not finished software by 
+any means, but we provide the scripts for people to explore the results
+in the paper, or investigate their own datasets. 
+
+Requirements: 
+
+The code is written variously in C, R and python, and relies on various 
+bash scripts. It has been tests on MacOSX and linux, but it's unlikely 
+to run as it is on any other platform. 
+
+1) R: Developed with R version 2.15. Packages required: RColorBrewer 
+(not strictly required)
+
+2) python: 2.6 or higher. Packages required: numpy, biopython, gzip, sys, 
+getopt. Most of these are standard, but you may need to install numpy
+and certainly biopython. 
+
+3) c: tested with gcc 
+
+4) For simulations, macs (http://code.google.com/p/macs/)
+
+Quickstart: 
+
+1) Complie c code: in the \libs directory: 
+>R CMD SHLIB inference.C
+
+2) To test, edit simulations/run_chr.sh as follows:
+
+a) MACS_DIR should point to the directory where the macs (and msformatter)
+binary is.
+
+b) SIMS_DIR should read "dir_to_put_simulations/${sim_type}/chr${CHR}"
+
+c) CODE_DIR should point to this diretory (i.e. the git repository)
+
+d) HM2_MAP you can ignore for now. 
+
+3) Then run test as follows:
+
+> run_chr CONST 1000000 constant_rate 0
+
+This should generate a bunch of subdirectories in 
+"dir_to_put_simulations/constant_rate/CONST" - check that there are
+a bunch of things in the results subdirectory to make sure everything's
+working. 
+
+4) To run more sophisticated simulations, make sure HM2_MAP points to 
+a directory with some recombination maps (genetic_map_GRCh37_chrXX.txt.gz)
+and then run: 
+> run_chr chr length sim_type 0 
+
+where chr=1..22, length=length in bp and sim_type is one of those listed
+in run_chr.sh. To run whole-genome simulations, look at run_all.sh.
+
+5) To actually run analysis on a dataset, refer to the scripts in \analysis
+These are set up to run on 1kg data, but shouldn't be too difficuly if you 
+wanted to work out how to run them on any other dataset. 
+
+Directory descriptions:
+
+./analysis - top level scripts for analysing whole chromosome or whole
+genome datasets. 
+
+./dev - Experimental files, mainly for comparing results with msmc
+unsupported.
+
+./libs - libraries with all the actual inference, processing and plotting
+functions.
+
+./scripts - low level scripts for processing data and running analysis. Called
+by the scripts in ./analysis and ./simulations. 
+
+./simulations - top level scripts for running simulations.
+
+./test - contains some dummy files used for testing.
+
+

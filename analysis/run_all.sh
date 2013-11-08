@@ -9,8 +9,11 @@ SIMS_ROOT=/data1/users/mathii/1000g/results/
 # Where is the code - this should point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 # Where are the seq and chip data vcfs, replace XX with chromosome number 1..22
+# These don't actually need to be different. 
 SEQ_DATA=/data1/users/mathii/1000g/data/seq/ALL.chrXX.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz
 CHIP_DATA=/data1/users/mathii/1000g/data/chip/ALL.chrXX.omni_2123_samples_b37_SHAPEIT.20120103.snps.chip_based.haplotypes.vcf.gz
+# Setup file - see the 1kg file for an example
+SETUP_FILE=${CODE_DIR}/analysis/1kg_setup.R
 # How many parallel processes?
 N_PROCS=22
 
@@ -32,7 +35,8 @@ do
     seq_path=${SEQ_DATA/XX/$CHR}
     chip_path=${CHIP_DATA/XX/$CHR}
     echo "$CODE_DIR/analysis/run_chr.sh ${CHR} ${seq_path} ${chip_path} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_args
-    echo "$CODE_DIR/analysis/func_chr.sh ${CHR} ${seq_path} ${chip_path} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_func_args
+    # #Uncomment to run analysis of functional sites - need to edit func_chr.sh first
+    # echo "$CODE_DIR/analysis/func_chr.sh ${CHR} ${seq_path} ${chip_path} ${CHR_LENGTHS[${CHR}]}" >> ${SIMS_ROOT}/tmp_func_args
 done
 
 #xargs --arg-file=${SIMS_ROOT}/tmp_args --max-procs=${N_PROCS} --replace --verbose /bin/bash -c "{}"
@@ -42,4 +46,5 @@ rm ${SIMS_ROOT}/tmp_func_args
 
 # Now run script to combine results across chromosomes
 #mkdir -p ${SIMS_ROOT}/all
-#R --vanilla --slave --quiet --args  ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} < ${CODE_DIR}/scripts/combine_1kg_analysis.R
+R --vanilla --slave --quiet --args  ${SIMS_ROOT} ${SIMS_ROOT}/all ${CODE_DIR} \
+    ${SETUP_FILE} < ${CODE_DIR}/scripts/combine_analysis.R

@@ -1,4 +1,4 @@
-## Analyse results from 1kg for a single chromosome. Should be fairly easy to modify to run
+## Analyse results from data for a single chromosome. Should be fairly easy to modify to run
 ## on general data. 
 
 ######################################################################################################
@@ -9,7 +9,7 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==7){
+if(length(args)==8){
   code.dir <- args[1]
   res.dir <- args[2]
   Ne <- as.numeric(args[3])
@@ -17,15 +17,16 @@ if(length(args)==7){
   mu <- as.numeric(args[5])
   max.log <- as.numeric(args[6])
   bins <- as.numeric(args[7])
+  setup.file <- args[8]
   plots <- TRUE
 } else{
-  stop("Need to specify 7 arguments")
+  stop("Need to specify 8 arguments")
 }
 
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-source(paste(code.dir, "/analysis/1kgsetup.R", sep=""))
+source(setup.file)
 haps <- read.table(paste(res.dir, "/f2_haplotypes.txt.gz", sep=""), as.is=TRUE, header=TRUE)
 error.params <- scan(paste(res.dir, "error_params.txt", sep="/"), quiet=TRUE)
 theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TRUE)
