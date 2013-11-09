@@ -125,9 +125,11 @@ compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params
 ## ll.mat: use this matrix if precalculated
 ## n.sims, burn.in, thin: mcmc parameters
 ## alpha: precision of prior
+## return.density.only: if true, just return the density function, otherwise return
+## a list with the density function and the counts. 
 ########################################################################################################
 
-estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbose=FALSE, prior=function(x){return(1+0*x)}, ll.mat=NA, error.params=NA, S.params=NA, n.sims=1000, burn.in=100, thin=10, alpha=1){
+estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbose=FALSE, prior=function(x){return(1+0*x)}, ll.mat=NA, error.params=NA, S.params=NA, n.sims=1000, burn.in=100, thin=10, alpha=1, return.density.only=TRUE){
   k <- length(logt.grid)
   
   if(all(is.na(ll.mat))){
@@ -147,9 +149,13 @@ estimate.t.density.mcmc <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, verbos
   all.probs <- all.counts/sum(all.counts)
   K <- integrate.trapezium(logt.grid, all.probs)
   d.fun <- approxfun(logt.grid, all.probs/K)
-  
-  return(d.fun)
-}
+
+  if(return.density.only){
+    return(d.fun)
+  } else{
+    return(list(density=d.fun, counts=all.counts))
+  }
+  }
 
 ########################################################################################################
 ## Integrate a piecewise linear function, with points at x and y, using the trapezium rule

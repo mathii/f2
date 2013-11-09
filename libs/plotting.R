@@ -238,3 +238,36 @@ res.to.latextab <- function( res, output, legend.order=(1:NROW(res))){
   latex.tab <- matrix(c(paste0(paste(c("", populations), collapse=" & "), "\\\\"), "\\hline", c(latex.tab)), ncol=1 ) 
   write.table(latex.tab, output, row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 }
+
+############################################################################################################################
+## Violin style plots to compare densities
+## densities:  list of density functions
+## x.pos: horizontal positions for centre of density
+## eps: plot density values larger than this
+## fill, border, col: usual colours. vectors.
+## grid: evaluate density at these positions.
+## scale: scale densities by this amount. 
+############################################################################################################################
+
+viola.plot <- function( densities, x.pos=1:length(densities), ylim=c(0,5), eps=1e-4, fill=rep("grey",length(densities)), border=rep("black", length(densities)), col=rep("black", length(densities)), grid=100, scale=0.1, labels=x.pos, lwd=1, ... ){
+  plot(x.pos, 0*x.pos, ylim=ylim, bty="n", type="n", xaxt="n", xlab="", ...)
+
+  for(i in 1:length(densities)){
+    ys=seq(min(ylim), max(ylim), length.out=grid)
+    xs=densities[[i]](ys)
+    include <- xs>eps
+    ysi <- ys[include]
+    xsi <- xs[include]
+    alpha=ifelse(xs>eps,"FF", sprintf("%02X", round(255*xs/eps))) 
+    used.border=paste0(border[i],alpha)
+    ## print(used.border)
+    polygon( c(x.pos[i]+scale*xsi, x.pos[i]-scale*rev(xsi)), c(ysi, rev(ysi)), border=border[i], col=fill[i], lty=1, lwd=lwd, ...)
+    ## whiskers
+    segments( x.pos[i], ys[1:(grid-1)], x.pos[i], ys[2:grid], col=used.border)
+    
+    q50 <- quantile.density(densities[[i]], 0.5)
+    lines(c(x.pos[i]+scale*densities[[i]](q50), x.pos[i]-scale*densities[[i]](q50)), c(q50,q50), col=col[i], lty=1, lwd=2*lwd)
+  }
+  
+  mtext(labels, 1, at=x.pos)
+}

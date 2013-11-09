@@ -7,19 +7,20 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==3){
+if(length(args)==4){
   chr.res.dir <- args[1]
   res.dir <- args[2]
   code.dir <- args[3]
-  plots <- TRUE
+  setup.file <- args[4]
+  plots <- FALSE
 } else{
-  stop("Need to specify 3 arguments")
+  stop("Need to specify 4 arguments")
 }
 
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
-source(paste(code.dir, "/analysis/1kgsetup.R", sep=""))
+source(setup.file)
 chrs <- c(1:22)
 
 ######################################################################################################
@@ -31,6 +32,7 @@ ll.mats.by.class <- list()
 haps.by.class <- list()
 
 classes <- c("lof", "coding", "noncoding")
+ns <- rep(0,2*length(classes))
 
 for( cls in classes){
 
@@ -62,7 +64,7 @@ for( cls in classes){
 
 ## the following is cnp'd from run_1kg_analysis_chr.R.
 ## estimate densities, by class for within/between.
-densities <- rep(list(list()),3)
+## densities <- list()
 
 i=1
 for(cls in classes){
@@ -78,38 +80,25 @@ for(cls in classes){
   alpha.w <- round(0.05*sum(within))
   alpha.b <- round(0.05*sum(between))
   
-  dens.w <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.w,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[within,])
-  dens.b <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.b,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[between,])
-  
-  densities[[i]][["within"]] <- dens.w
-  densities[[i]][["between"]] <- dens.b
+  dens.w <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.w,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[within,], return.density.only=FALSE)
+  dens.b <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.b,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[between,], return.density.only=FALSE)
+
+  densities[[i]] <- dens.w$density
+  densities[[i+length(classes)]] <- dens.b$density
+
+  ns[i] <- sum(within)
+  ns[i+length(classes)] <- sum(between)
+
   i=i+1
 }
 
-save.image(paste0(res.dir, "/ll_environment.Rdata"))
+col=c(rep("#377EBA", 3), rep("#E41A1C", 3))
+border=col
+fill=paste0(col, "80")
+x.pos=c(1.25,2.25,3.25,4.75,5.75,6.75)
 
-q5 <- q50 <- q95 <- matrix(0,nrow=2,ncol=3)
-
-for( i in 1:3){
-  for(j in 1:2){
-    a <- quantile.density(densities[[i]][[j]], 0.05)
-    b <- quantile.density(densities[[i]][[j]], 0.5)
-    c <- quantile.density(densities[[i]][[j]], 0.95)
-    q5[j,i] <- a
-    q50[j,i] <- b
-    q95[j,i] <- c    
-  }
-}
-
-## Just plot the medians
-pdf(paste0(res.dir, "/by_func.pdf"))
-xs <- c(1,2,3,4,5,6)
-ys <- c(q50[1,], q50[2,])
-plot(xs, ys, pch=16, col=c("blue", "blue", "blue", "red", "red", "red"), bty="n", xaxt="n", ylab=expression(Age (Log[10]~generations)), ylim=c(0,4), xlab="")
-segments(1:3,q5[1,],1:3,q95[1,], col="blue")
-segments(4:6,q5[2,],4:6,q95[2,], col="red")
-axis(1, at=c(1:6), labels=c("LOF", "coding", "noncoding", "LOF", "coding", "noncoding"))
-legend("topleft", c("Within", "Between"), col=c("blue", "red"), pch=16, bty="n")
-abline(v=3.5, lty=3)
-dev.off()
+viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding"),2), xlim=c(1,7), ylab=expression(Age~(Log[10]~generations)) )
+abline(v=4, lty=3)
+mtext(paste0("(",format(ns, big.mark=",", trim=TRUE),")"), 1, at=x.pos, line=1)
+mtext(c("Within population", "Between populations"), 3, at=c(2.25, 5.75), line=0)
 

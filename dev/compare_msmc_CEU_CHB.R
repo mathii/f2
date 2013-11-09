@@ -11,7 +11,8 @@ msmc <- read.table("~/f2_age/1000g/CHB_CEU_4combined_0,1,4,5_msmc.final.txt", he
 dyn.load("~/f2_age/code/libs/inference.so")
 code.dir="~/f2_age/code/"
 chr.res.dir="~/f2_age/1000g/results/"
-source(paste("~/f2_age/code/analysis/1kgsetup.R", sep=""))
+source(paste("~/f2_age/code/analysis/1kg_setup.R", sep=""))
+source(paste0(code.dir, "/libs/include.R"))
 chrs <- c(1:22)
 
 ######################################################################################################
@@ -62,15 +63,14 @@ if(! "d.b" %in% ls() ){
 }
 
 par(mar=c(5.1,4.1,2.1,4.1))
-plot(msmc$left_time_boundary/1.25e-8, 2*msmc$lambda_01/(msmc$lambda_00+msmc$lambda_11), type="s", log="x", ylim=c(0,1), xlim=c(100,20000), bty="n", xlab="Generations", ylab="MSMC gene flow estimate", col="#E41A1C", yaxt="n", main="CEU_CHB")
-  axis(2, col="#E41A1C")
-  scale <- max(d.b(logt.grid))
-lines(10^logt.grid, d.b(logt.grid)/scale, col="#377EBA")
-axis(4, col="#377EBA", labels=FALSE)
+plot(0.03*msmc$left_time_boundary/1.25e-8, 2*msmc$lambda_01/(msmc$lambda_00+msmc$lambda_11), type="s", log="x", ylim=c(0,1), bty="n", xlab="Time (kya)", ylab="MSMC gene flow estimate", col="#E41A1C", yaxt="n", lwd=2, xaxt="n")
+axis(2, col="#E41A1C")
+axis(1, at=c(seq(5,10,1), seq(20,100,10), seq(200,500,100)), labels=FALSE)
+mtext(c(5,10,20,50,100,200,500), 1,at= c(5,10,20,50,100,200,500), line=1)
+scale <- max(d.b(logt.grid))
+lines(0.03*10^logt.grid, d.b(logt.grid)/scale, col="#377EBA", lwd=2)
+axis(4, col="#377EBA", labels=FALSE, lwd=2, at=c(0,1))
 mtext(expression(f[2]~age~density), 4, line=2)
+abline(v=40, lty=3, col="#E41A1C")
+abline(v=11, lty=3, col="#377EBA")
 
-## chose other features here
-## abline(v=224, lty=3)
-## abline(v=560*2, lty=3)
-## abline(v=1120, lty=3)
-## abline(v=560, lty=3)
