@@ -21,7 +21,7 @@ if(length(args)==7){
   max.log <- as.numeric(args[6])
   bins <- as.numeric(args[7])
   plots <- TRUE
-  ## plots <- FALSE
+  verb <- FALSE
 } else{
   stop("Need to specify 7 arguments")
 }
@@ -50,7 +50,7 @@ if(!file.exists( paste(res.dir, "/matched_haps.txt.gz", sep=""))){
   names(S.params) <- c("S", "Lp")
   S.params$theta <- 4*Ne*mu
   S.params$Ep <- S.params$Lp*(theta.estimates[matched$ID1]+theta.estimates[matched$ID2])
-  ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
+  ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=verb)
   save.image(paste(res.dir, "/ll_and_density_environment.Rdata", sep=""))
 }
 matched <- read.table(paste(res.dir, "/matched_haps.txt.gz", sep=""), as.is=TRUE, header=TRUE)
@@ -95,12 +95,12 @@ norm.2.p <- function(x){return(dnorm(x, mean=2))}
 
 denss <- list()
 ll.mats <- list()
-ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
-ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=FALSE)
-ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=FALSE)
-ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true, verbose=FALSE)
-ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params, verbose=FALSE)
-ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
+ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=verb)
+ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=verb)
+ll.mats[[3]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=NA, verbose=verb)
+ll.mats[[4]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params.true, verbose=verb)
+ll.mats[[5]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=S.params, verbose=verb)
+ll.mats[[6]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=verb)
 
 cat("Sampling Densities\n")
 alpha <- round(0.05*NROW(matched))

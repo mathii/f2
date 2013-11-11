@@ -1,5 +1,6 @@
 ## Functions used to infer the ages of chunks.
 library(MASS)
+library(gsl)
 
 ########################################################################################################
 ## loglikelihood for age t, conditional on number of singletons and genetic length
@@ -17,23 +18,15 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
   t1 <- 0
   
   if(all(is.na(error.params))){
-    ## t1 <- (dgamma(Lg, shape=1+1/D, rate=4*Ne*t*pf(t), log=TRUE))
     t1 <- (dgamma(Lg, shape=shape, rate=4*Ne*t*pf(t), log=TRUE))
   } else{
-    inner <- function(x){
-      ## dgamma(x, shape=1+1/D, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
-      dgamma(x, shape=shape, rate=4*Ne*t*pf(t))*dgamma(Lg-x,shape=error.params[1],rate=error.params[2])
-    }
-    ## This is to ensure that we are not integrating over large zero regions
-    upper=max(0,Lg-1e-6)                #the 1e-6 is because when shape<0 the gamma dist is not defined at x=0
-    new.upper=upper
-    while(inner(new.upper)==0 & upper>Lg/16){
-      upper=new.upper
-      new.upper=upper/2
-    }
-    t1 <- log(integrate(inner, lower=0, upper=upper, stop.on.error=FALSE)$value)
+    r=shape
+    lm=4*Ne*t*pf(t)
+    s=error.params[1]
+    mu=error.params[2]
+    t1 <- r*log(lm)+log(hyperg_1F1(r, r+s, Lg*(mu-lm)))
   }
-
+  
   t2 <- 0
   if(!all(is.na(S.params))){            #If we supplied singleton information, use that. 
     ## Sum of poisson and negative binomial...
@@ -98,13 +91,17 @@ make.pnfn <- function(n, t.grid=c((1:10)/10, 2:10)){
 
 compute.ll.matrix <- function(Lgs, Ds, Ne, pf, logt.grid=(0:60)/10, error.params=NA, S.params=NA, verbose=FALSE, shape=1.7){
   ll.mat <- matrix(0, nrow=length(Lgs), ncol=length(logt.grid))
+
+  have.s.params <- !all(is.na(S.params))
   
   for(i in 1:length(Lgs)){
+    Lg=Lgs[i]
+    D=Ds[i]
+    s.p <- NA
+    if(have.s.params){s.p <- S.params[i,]}
     for(j in 1:length(logt.grid)){
       if(verbose){cat(paste("\r", i, j))}
-      s.p <- NA
-      if(!all(is.na(S.params))){s.p <- S.params[i,]}
-      ll.mat[i,j] <- loglikelihood.age(t=(10^(logt.grid[j]))/2/Ne, Lg=Lgs[i], D=Ds[i], Ne=Ne, pf=pf,  error.params=error.params, S.params=s.p, shape=shape)
+      ll.mat[i,j] <- loglikelihood.age(t=(10^(logt.grid[j]))/2/Ne, Lg=Lg, D=D, Ne=Ne, pf=pf,  error.params=error.params, S.params=s.p, shape=shape)
     }
   }
   if(verbose){cat("\n")}

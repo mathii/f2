@@ -10,7 +10,7 @@ The code is written variously in C, R and python, and relies on various
 bash scripts. It has been tests on MacOSX and linux, but it's unlikely 
 to run as it is on any other platform. 
 
-1) R: Developed with R version 2.15. Packages required: RColorBrewer 
+1) R: Developed with R version 2.15. Packages required: gsl, RColorBrewer 
 (not strictly required).
 
 2) python: 2.6 or higher. Packages required: numpy, biopython, gzip, sys, 
