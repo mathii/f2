@@ -26,11 +26,11 @@ HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
 CODE_DIR=~/f2/f2_age
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-nhp1=100
-nhp2=100
+nhp1=200
+nhp2=200
 nhp=200
 ne=14000
- dbp=0.66
+dbp=0.66
 mu=0.000000012
 
 ##############################################################################################################
