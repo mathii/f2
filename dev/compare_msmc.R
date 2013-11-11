@@ -5,7 +5,9 @@
 ## sim.type="ancient_split_migration" 
 ## sim.type="ancient_split" 
 ## sim.type="third_party" 
-sim.type="ancient_split_migration_growth" 
+## sim.type="ancient_split_migration_growth" 
+sim.type="ancient_split_migration_bottleneck" 
+
 chr="20"
 
 load(paste0("~/f2_age/simulations/", sim.type, "/chr", chr, "/results/ll_and_density_environment.Rdata"))
@@ -33,4 +35,4 @@ mtext(expression(f[2]~age~density), 4, line=2)
 ## abline(v=224, lty=3)
 ## abline(v=560*2, lty=3)
 abline(v=1120, lty=3)
-## abline(v=560, lty=3)
+abline(v=560, lty=3)

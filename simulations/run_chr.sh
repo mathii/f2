@@ -30,7 +30,7 @@ nhp1=100
 nhp2=100
 nhp=200
 ne=14000
-dbp=0.66
+ dbp=0.66
 mu=0.000000012
 
 ##############################################################################################################
@@ -156,6 +156,15 @@ ancient_split_migration_bottleneck)
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.01 2 x 560 560 x \
 	    -en 0.0198 1 1 -en 0.0196 1 0.01 -en 0.0197 2 1 -en 0.0195 2 0.01 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+ancient_split_migration_interval)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -ema 0.01 2 x 0 0 x \
+	     -ema 0.005 2 x 560 560 x 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
