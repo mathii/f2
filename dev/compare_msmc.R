@@ -6,7 +6,8 @@
 ## sim.type="ancient_split" 
 ## sim.type="third_party" 
 ## sim.type="ancient_split_migration_growth" 
-sim.type="ancient_split_migration_bottleneck" 
+## sim.type="ancient_split_migration_bottleneck" 
+sim.type="ancient_split_migration_200" 
 
 chr="20"
 
@@ -15,6 +16,7 @@ dyn.load("~/f2_age/code/libs/inference.so")
 msmc <- read.table(paste0("~/f2_age/simulations/", sim.type, "/chr", chr, "/results/msmc_results_all.final.txt"), header=T, as.is=T)
 
 within <- (matched$ID1<51 & matched$ID2<51)|(matched$ID1>50 & matched$ID2>50)
+within <- (matched$ID1<101 & matched$ID2<101)|(matched$ID1>100 & matched$ID2>100)
 between <- !within
 
 alpha.w <- round(0.05*sum(within))
