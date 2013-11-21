@@ -175,24 +175,25 @@ get.mapfn <- function(map.file){
 ## ways and estimate the total. These give different answers because the results are correlated. 
 ########################################################################################################
 
-fit.gamma.to.error <- function(path.to.samples, samples, map.file, pairs=1000, each=1000, verbose=FALSE, direction=c("one.way", "two.way")){
+fit.gamma.to.error <- function(path.to.samples, map.file, samples1, samples2=samples1 , pairs=1000, each=1000, verbose=FALSE, direction=c("one.way", "two.way")){
   LOWER.BOUND <- 1e-6                   #just to help with optimization
   pos <- scan(paste(path.to.samples, "/pos.gz", sep=""), quiet=TRUE)
   map <- get.mapfn(map.file)
-  n <- length(samples)
+  n1 <- length(samples1)
+  n2 <- length(samples2)
   l <- length(pos) 
-  p1 <- sort(sample(n, size=pairs, replace=TRUE))
-  p2 <- sample(n, size=pairs, replace=TRUE)
+  p1 <- sort(sample(n1, size=pairs, replace=TRUE))
+  p2 <- sample(n2, size=pairs, replace=TRUE)
 
   results.l <- rep(0, pairs*each)
   results.r <- rep(0, pairs*each)
 
   if(verbose){cat("Estimating length overestimate parameters\n")}
   for(i in 1:pairs){
-    while(p2[i]==p1[i]){p2[i] <- sample(n, size=1)} #just in case we accidentally picked the same person. 
+    while(p2[i]==p1[i]){p2[i] <- sample(n2, size=1)} #just in case we accidentally picked the same person. 
     if(verbose){cat(paste("\r", i, "/", pairs, sep="" ))}
-    gt1 <- scan(paste( path.to.samples, "/", samples[p1[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
-    gt2 <- scan(paste( path.to.samples, "/", samples[p2[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
+    gt1 <- scan(paste( path.to.samples, "/", samples1[p1[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
+    gt2 <- scan(paste( path.to.samples, "/", samples2[p2[i]], ".gt.gz", sep =""), quiet=TRUE, nmax=l)
     
     for(j in 1:each){
       x <- sample(min(pos):max(pos), size=1)
