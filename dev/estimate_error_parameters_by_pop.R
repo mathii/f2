@@ -8,7 +8,7 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==9){
+if(length(args)==10){
   code.dir <- args[1]
   hap.dir <- args[2]
   res.dir <- args[3]
@@ -20,7 +20,7 @@ if(length(args)==9){
   nbp <- as.numeric(args[9])                        #length of sequence.
   setup.file <- args[10]
 } else{
-  stop("Need to specify 9 arguments")
+  stop("Need to specify 10 arguments")
 }
 
 ######################################################################################################
@@ -38,7 +38,8 @@ shapes <- matrix(0, npop, npop)
 rates <- matrix(0, npop, npop)
 
 for(i in 1:npop){
-  for(j in i:npop){ 
+  for(j in i:npop){
+    cat(paste0(pop[i], "-", pop[j]))
     samples1 <- samples[pop.map==pop[i]]
     samples2 <- samples[pop.map==pop[j]]
 
@@ -50,9 +51,9 @@ for(i in 1:npop){
     write.table(shapes, paste(res.dir, "error_params_bypop_shapes.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
     write.table(rates, paste(res.dir, "error_params_bypop_rates.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
 
-cat("Estimating theta\n")
-## Estimate theta per sample
-N <- length(samples)
-singletons <- count.singletons.from.positions(cbind(1:N, 1:N), rep(0, length(samples)), rep(nbp, length(samples)), paste(hap.dir, "pos.idx.f1.gz", sep="/") )
-thetas <- singletons/2/nbp              #expected number of singletons per base, per chromosome. 
-write.table(thetas, paste(res.dir, "theta_estimates.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
+## cat("\nEstimating theta\n")
+## ## Estimate theta per sample
+## N <- length(samples)
+## singletons <- count.singletons.from.positions(cbind(1:N, 1:N), rep(0, length(samples)), rep(nbp, length(samples)), paste(hap.dir, "pos.idx.f1.gz", sep="/") )
+## thetas <- singletons/2/nbp              #expected number of singletons per base, per chromosome. 
+## write.table(thetas, paste(res.dir, "theta_estimates.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
