@@ -39,9 +39,9 @@ rates <- matrix(0, npop, npop)
 
 for(i in 1:npop){
   for(j in i:npop){
-    cat(paste0(pop[i], "-", pop[j]))
-    samples1 <- samples[pop.map==pop[i]]
-    samples2 <- samples[pop.map==pop[j]]
+    cat(paste0(pops[i], "-", pops[j]))
+    samples1 <- samples[pop.map==pops[i]]
+    samples2 <- samples[pop.map==pops[j]]
 
     error.params <- fit.gamma.to.error(paste(hap.dir, "by_sample", sep="/"), map.file, samples1, samples2, pairs=pairs, each=each, verbose=TRUE, direction=direction)
     shapes[i,j] <- shapes[j,i] <- error.params[1]
