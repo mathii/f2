@@ -17,7 +17,8 @@ if(length(args)==9){
   pairs <- as.numeric(args[6])
   each <- as.numeric(args[7])
   direction <- args[8]                  #either "one.way" or "two.way"
-  nbp <- as.numeric(args[9])                        #length of sequence. 
+  nbp <- as.numeric(args[9])                        #length of sequence.
+  setup.file <- args[10]
 } else{
   stop("Need to specify 9 arguments")
 }
@@ -25,13 +26,29 @@ if(length(args)==9){
 ######################################################################################################
 
 source(paste(code.dir, "/libs/include.R", sep=""))
+source(setup.file)
 samples <- scan(sample.file, quiet=TRUE, what="")
 
 ######################################################################################################
 
-## Length overestimate parameters 
-error.params <- fit.gamma.to.error(paste(hap.dir, "by_sample", sep="/"), map.file, samples,  pairs=pairs, each=each, verbose=TRUE, direction=direction)
-write.table(error.params, paste(res.dir, "error_params.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
+## Length overestimate parameters
+pops <- unique(pop.map)
+npop <- length(unique(pop.map))
+shapes <- matrix(0, npop, npop)
+rates <- matrix(0, npop, npop)
+
+for(i in 1:npop){
+  for(j in i:npop){ 
+    samples1 <- samples[pop.map==pop[i]]
+    samples2 <- samples[pop.map==pop[j]]
+
+    error.params <- fit.gamma.to.error(paste(hap.dir, "by_sample", sep="/"), map.file, samples1, samples2, pairs=pairs, each=each, verbose=TRUE, direction=direction)
+    shapes[i,j] <- shapes[j,i] <- error.params[1]
+    rates[i,j] <- rates[j,i] <- error.params[2]
+  }
+}
+    write.table(shapes, paste(res.dir, "error_params_bypop_shapes.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
+    write.table(rates, paste(res.dir, "error_params_bypop_rates.txt", sep="/"), sep="\t", col.names=FALSE, row.names=FALSE)
 
 cat("Estimating theta\n")
 ## Estimate theta per sample

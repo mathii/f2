@@ -14,7 +14,6 @@ library(gsl)
 ########################################################################################################
 
 loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.7){
-  inner <- function(x){return(NA)}
   t1 <- 0
   
   if(all(is.na(error.params))){
@@ -24,6 +23,7 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
     lm=4*Ne*t*pf(t)
     s=error.params[1]
     mu=error.params[2]
+    ## print(c(Lg, r, lm, s, mu, r*log(lm), log(hyperg_1F1(r, r+s, Lg*(mu-lm)))))
     t1 <- r*log(lm)+log(hyperg_1F1(r, r+s, Lg*(mu-lm)))
   }
   
@@ -36,7 +36,7 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
     probs <- dpois(s.vals, lambda=S.params$theta*S.params$Lp*t)*dnbinom(S-s.vals, size=2, prob=nbprob)
     t2 <- log(sum(probs))
   }
-
+  ## print(c(t1,t2))
   ## bit hacky until we figure out how to deal with this underflow...
   if(t1+t2< -1e4){                       #This should be small enough!
     return(-1e4-t)
