@@ -138,6 +138,17 @@ ancient_split_migration)
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+ancient_split_growth)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	ne=140000
+	theta=`echo "4*$ne*$mu" | bc`
+	rho=`echo "4*$ne*0.00000001" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt  -eN 0.00201 0.1 -ej 0.002 2 1 -G 115 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
 ancient_split_migration_growth)
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	ne=140000

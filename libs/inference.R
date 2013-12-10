@@ -24,6 +24,7 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
     s=error.params[1]
     mu=error.params[2]
     ## print(c(Lg, r, lm, s, mu, r*log(lm), log(hyperg_1F1(r, r+s, Lg*(mu-lm)))))
+    ## print(c(r, s, mu, lm))
     t1 <- r*log(lm)+log(hyperg_1F1(r, r+s, Lg*(mu-lm)))
   }
   
@@ -270,3 +271,22 @@ confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, ma
   return(2*Ne*c(lower, upper))
 }
 
+########################################################################################################
+## MLE from haps. Compute vector of MLEs, given data frame with hap.len, f1, f2, and
+## S.params
+########################################################################################################
+
+MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.7, verbose=FALSE){
+
+  nh <- NROW(haps)
+  t.hat <- rep(0, nh)
+  has.S.params <- !all(is.na(S.params))
+  sp <- NA
+  for(j in 1:nh){
+    if(verbose){cat(paste0("\r", j, "/", nh))}
+    if(has.S.params){sp <- S.params[j,]}
+    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp)$maximum
+  }
+  if(verbose){cat("\rDone\n")}
+  return(t.hat)
+}
