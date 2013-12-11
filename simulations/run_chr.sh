@@ -145,7 +145,7 @@ ancient_split_growth)
 	rho=`echo "4*$ne*0.00000001" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
-            -h 1e3 -R ${MD}/map.txt  -eN 0.00201 0.1 -ej 0.002 2 1 -G 115 2> \
+            -h 1e3 -R ${MD}/map.txt  -eN 0.00201 0.1 -ej 0.002 2 1 -G 115 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
@@ -157,7 +157,7 @@ ancient_split_migration_growth)
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt  -eN 0.00201 0.1 -ej 0.002 2 1 \
-	    -ema 0.001 2 x 560 560 x -G 115 2> \
+	    -ema 0.001 2 x 560 560 x -G 115 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
