@@ -154,7 +154,7 @@ get.mapfn <- function(map.file){
   mapfn <- NULL
   if(!is.numeric(map.file)){
     map <- read.table(map.file, as.is=TRUE, header=TRUE)
-    mapfn <- approxfun(map[,2], map[,4], rule=2, method="linear")
+    mapfn <- approxfun(map$Position.bp. , map$Map.cM. , rule=2, method="linear")
   } else{
     r <- as.numeric(map)
     mapfn <- approxfun(c(0, 1e9), c(0,r*1e3), rule=1, method="linear") #only going up to 1cm, but rule=1 ensure NA outside this. 

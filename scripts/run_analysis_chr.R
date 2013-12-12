@@ -78,4 +78,4 @@ for(i in 1:(npop)){
 }
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,4), ylim=c(0,3) )
+density.summary.plots(densities, populations, pop.cols, res.dir, max.log=max.log, xlim=c(1,4), ylim=c(0,3) )
