@@ -19,7 +19,8 @@ and certainly biopython.
 
 3) c: tested with gcc.
 
-4) For simulations, macs (http://code.google.com/p/macs/).
+4) For simulations, macs (http://code.google.com/p/macs/). And/or fastsimcoal
+ (http://cmpg.unibe.ch/software/fastsimcoal2/)
 
 5) For data analysis, vcftools (0.1.11). 
 
@@ -77,6 +78,8 @@ functions.
 by the scripts in ./analysis and ./simulations. 
 
 ./simulations - top level scripts for running simulations.
+
+./simulations2 - simulations using fastsimcoal2 instead of macs
 
 ./test - contains some dummy files used for testing.
 
