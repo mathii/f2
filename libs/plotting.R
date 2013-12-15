@@ -160,7 +160,7 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 ## res.dir: directory to output results. if NULL then open windows. 
 ############################################################################################################################
 
-density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), ...){
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, ...){
   plots <- !is.null(res.dir)
   npop <- length(populations)
   
@@ -191,7 +191,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
       res <- matrix(0, npop, npop)
       for(i in 1:npop){
         for(j in 1:npop){
-          res[i,j] <- 10^quantile.density(densities[[i]][[j]], q)
+          res[i,j] <- 10^quantile.density(densities[[i]][[j]], q, upper=max.log)
         }
       }
       
