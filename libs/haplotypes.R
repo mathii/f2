@@ -116,11 +116,11 @@ find.inconsistent.hom <- function(gt1, gt2, gt.pos, pos, len=length(gt1)){
   if(gt.pos[idx.l]==pos){idx.r <- idx.l}
 
   idx.l <- max(1,idx.l-1)
-  while(idx.l>1 & abs(gt1[idx.l]-gt2[idx.l])<2){
+  while(idx.l>1 & !((gt1[idx.l]==0 & gt2[idx.l]==2)|(gt1[idx.l]==2 & gt2[idx.l]==0))){
     idx.l <- idx.l-1
   }
   idx.r <- min(len, idx.r+1) 
-  while(idx.r<len & abs(gt1[idx.r]-gt2[idx.r])<2){
+  while(idx.r<len & !((gt1[idx.r]==0 & gt2[idx.r]==2)|(gt1[idx.r]==2 & gt2[idx.r]==0))){
     idx.r <- idx.r+1
   }
   return(c(idx.l, idx.r))
