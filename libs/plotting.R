@@ -126,13 +126,22 @@ overlapping.power.plot <- function(elements, cols, main="", xlab="", legend.pos=
 ## lwd, lty: standard graphical parameters
 ############################################################################################################################
 
-plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:length(cols)), ...){
+plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:length(cols)), xlim=c(0,5), ...){
   names <- names(densities)
   n <- length(names)
-  plot(grid, densities[[1]](grid), col=cols[1], lwd=lwd, lty=lty, bty="n", type="l", xlab=expression(Age~(log[10]~generations)), ylab="Density", ...)
+  plot(10^grid, densities[[1]](grid), col=cols[1], lwd=lwd, lty=lty, bty="n", type="l", xlab=expression(Age~(generations)), ylab="Density", log="x", xlim=10^xlim, xaxt="n", ...)
+
+  at=c(10^floor(xlim[1]))
+  for(int in seq(floor(xlim[1]), floor(xlim[2]-1))){
+    at=c(at, 10^int*(2:10))
+    mtext(bquote(10^.(int)), 1, at=10^int, line=1)
+  }
+  mtext(bquote(10^.(int+1)), 1, at=10^(int+1), line=1)
+  axis(1, at=at, label=FALSE)
+  
   if(n>1){
     for(i in 2:n){
-      lines(grid, densities[[i]](grid), col=cols[i], lwd=lwd, lty=lty)
+      lines(10^grid, densities[[i]](grid), col=cols[i], lwd=lwd, lty=lty)
     }
   }
   legend("topright", populations[legend.order], col=cols[legend.order], lwd=lwd, lty=lty, bty="n")
@@ -160,7 +169,7 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 ## res.dir: directory to output results. if NULL then open windows. 
 ############################################################################################################################
 
-density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, ...){
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), ...){
   plots <- !is.null(res.dir)
   npop <- length(populations)
   
@@ -170,7 +179,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
   }
   names(within.list) <- populations
   if(plots){pdf(paste(res.dir, "/within.pdf", sep=""))}else{dev.new()}
-  plot.densities(within.list, logt.grid, cols=pop.cols[populations], main="within", legend.order=legend.order, ...)
+  plot.densities(within.list, grid, cols=pop.cols[populations], main="within", legend.order=legend.order, xlim=xlim, ylim=ylim, ...)
   if(plots){dev.off()}
   
   for(i in 1:npop){
@@ -181,7 +190,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
     names(between.list) <- populations
 
     if(plots){pdf(paste(res.dir, "/between_", populations[i], ".pdf", sep=""))}else{dev.new()}
-    plot.densities(between.list, logt.grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order, ...)
+    plot.densities(between.list, grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order,  xlim=xlim, ylim=ylim, ...)
     if(plots){dev.off()}
   }
 
