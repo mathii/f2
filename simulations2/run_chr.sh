@@ -91,7 +91,7 @@ python ${CD}/scripts/macs_genotype_to_hap_files.py -g ${WD}/genotypes.txt.gz \
 
 # 4) Get the real haplotyes
 python ${CD}/scripts/find_real_nns.py -t ${WD}/trees.newick.txt.gz  \
-    -l ${WD}/trees.lengths.txt.gz -o ${TH}/NN_haplotypes.txt.gz -r 1000 -f1 -e 1.0
+    -l ${WD}/trees.lengths.txt.gz -o ${TH}/NN_haplotypes.txt.gz -r 1000 -f1 -e 1.0 -v1
 
 # 5) extract f1 and f2 variants. 
 python ${CD}/scripts/calculate_fn_sites.py -h ${TH}/haps.f1.gz -o ${TH}/pos.idx.f1.gz -n 1 > ${TH}/f1.pos.tmp.log
