@@ -8,9 +8,7 @@
 ##############################################################################################################
 # Script arguments
 CHR=$1
-nbp=$2
-sim_type=$3
-sleep_time=$4
+sim_type=$2
 
 ##############################################################################################################
 
@@ -51,8 +49,6 @@ for dir in ${WD} ${TH}/by_sample ${RD} ${MD}
 do
     mkdir -p ${dir}
 done
-
-sleep ${sleep_time}
 
 # redirect output to logfile                                                                                                                                   
 LOG=${RD}/log.txt
