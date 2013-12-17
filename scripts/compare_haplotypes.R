@@ -4,7 +4,7 @@
 args <- commandArgs(TRUE)
 set.seed(12345)
 
-if(length(args)==7){
+if(length(args)==8){
   code.dir <- args[1]
   hap.dir <- args[2]
   res.dir <- args[3]
@@ -12,9 +12,10 @@ if(length(args)==7){
   dbl.pwr <- as.numeric(args[5])
   map.file <- args[6]
   nseq <- as.numeric(args[7])/2
+  simulator <- args[8]
   plots <- TRUE
 } else{
-  stop("Need to specify 7 arguments")
+  stop("Need to specify 8 arguments")
 }
 
 ################################################################################################################
@@ -36,7 +37,12 @@ true.haps$f1 <- NA
 true.haps$f2 <- NA
 true.haps$map.len <- NA
 true.haps$f2.hap.id <- NA
-true.haps$Age <- true.haps$Age*Ne*4     #Is this a factor of 2.. ms says it is 4Ne?? 
+if(simulator=="macs"){
+  true.haps$Age <- true.haps$Age*Ne*4     #Is this a factor of 2.. ms says it is 4Ne?}
+} else if(simulator=="fastsimcoal"){
+} else{
+  stop("I only know what to do with macs or fastsimcoal output")
+}
 true.haps <- true.haps[true.haps$ID1!=true.haps$ID2,]
 
 ## a bit of a hack - to make sure that we catch the ones at the end.

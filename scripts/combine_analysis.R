@@ -33,12 +33,17 @@ i=1
 for(chr in chrs){
   cat(paste("\r", chr))
   load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
-  
-   t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE)
+
+  if(!exists("t.hats", envir=subenv){   #backwards compatibility. 
+    t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE)
+  } else{
+    t.hats[[i]] <- subenv$t.hats
+  }
+     
   haps[[i]] <- subenv$haps
 }
 cat("\n")
-
+rm(subenv)
 t.hats <- do.call("rbind", t.hats)
 haps <- do.call("rbind", haps)
 
@@ -54,8 +59,7 @@ for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
     dens <- density(log10(t.hats[include]))
-    densities[[i]][[j]] <- approxfun(dens, rule=2)
-    densities[[j]][[i]] <- approxfun(dens, rule=2)
+    densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
   }
 }
 

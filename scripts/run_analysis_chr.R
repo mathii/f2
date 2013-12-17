@@ -33,15 +33,10 @@ theta.estimates <- scan(paste(res.dir, "theta_estimates.txt", sep="/"), quiet=TR
 
 ######################################################################################################
 
-#if(!("p.fun" %in% ls())){
-#  cat("Making pn function\n")
-#  p.fun <- make.pnfn(nseq*2)              #probably need to speed this up.
-#  ## p.fun <- make.pnfn(250)              #probably need to speed this up. 
-#}
-
 p.fun<-function(t){return(1)}
 
-haps$hap.len <- haps$hap.right-haps$hap.left
+## Shouldn't need this, but for backwards compatability.
+if("ibd.len" %in% names(haps)){names(haps)[which(names(haps)=="ibd.len")] <- "hap.len"}
 haps <- haps[haps$map.len>0,]
 
 ## Singleton parameters
@@ -49,11 +44,7 @@ S.params <- haps[,c("f1", "hap.len")]
 names(S.params) <- c("S", "Lp")
 S.params$theta <- 4*Ne*mu
 S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
-
-## Compute likelihood
-cat("Computing likelihood\n")
-logt.grid <- seq(0, max.log, length.out=bins)
-ll.mat <- compute.ll.matrix( haps$map.len, haps$f2, Ne, p.fun, logt.grid=logt.grid, error.params=error.params, S.params=S.params, verbose=FALSE)
+t.hats <- MLE.from.haps(haps, Ne, S.params=S.params,  error.params=error.params, verbose=TRUE)
 
 save.image(paste(res.dir, "/ll_environment.Rdata", sep=""))
 
@@ -68,9 +59,8 @@ for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
     if(sum(include)>1){
-      alpha <- max(1,round(0.05*sum(include)))
-      dens <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[include,,drop=FALSE])
-      densities[[i]][[j]] <- densities[[j]][[i]] <- dens
+      dens <- density(log10(t.hats))
+      densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
     }else{
       densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0*x)}
     }
@@ -78,4 +68,4 @@ for(i in 1:(npop)){
 }
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, max.log=max.log, xlim=c(1,4), ylim=c(0,3) )
+density.summary.plots(densities, populations, pop.cols, res.dir, max.log=max.log, xlim=c(1,5), ylim=c(0,2) )

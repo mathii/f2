@@ -1,12 +1,15 @@
-# Runs on (slighty processed) macs output files to extract the real f2 haplotypes. 
+# Runs on (slighty processed) macs output files to extract the real f2 haplotypes.
+# Takes newick trees as input although, note: macs (and fastsimcoal) output trees
+# with node names as integers (decimals for fastsimcoal), which is not allowed
+# in the newick format - these get parsed as confidences, and this script hacks them
+# back to labels - so be careful if you use if you use it for anything else. Also
+# will not work if you are doing multiple simulations with fastsimcoal and your nodes
+# are named like 123.n where n is the number of the simulation. 
 
 from __future__ import division
 import numpy as np
-import gzip, sys, getopt
+import gzip, sys, getopt, pdb
 from Bio import Phylo
-
-EPS1=1e-4                                  # small number to compare times 
-EPS2=1e10                                     # assume that this implies a tree change
 
 ##########################################################################################################
 
@@ -14,10 +17,10 @@ def parse_options():
     """
     Options are described by the help() function
     """
-    options ={ "tree_file":"", "tree_len_file":"", "out_file":"", "tree_pos_file":"", "resolution":1, "verbose":False  }
+    options ={ "tree_file":"", "tree_len_file":"", "out_file":"", "tree_pos_file":"", "resolution":1, "verbose":False, "offset":0, "eps":1e-4  }
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:p:l:o:r:v:", ["gt", "p", "len", "out", "res", "verbose"])
+        opts, args = getopt.getopt(sys.argv[1:], "t:p:l:o:r:v:f:e:", ["gt", "p", "len", "out", "res", "ver", "off", "eps"])
     except Exception as err:
         print str(err)
         sys.exit()
@@ -29,6 +32,8 @@ def parse_options():
         elif o in ["-p","--pos"]:     options["tree_pos_file"] = a
         elif o in ["-r","--res"]:     options["resolution"] = int(a)
         elif o in ["-v","--ver"]:     options["verbose"] = bool(a)
+        elif o in ["-f","--off"]:     options["offset"] = int(a)
+        elif o in ["-e","--eps"]:     options["eps"] = float(a)
 
     print "found options:"
     print options
@@ -74,7 +79,7 @@ def main(options):
             is_f2=np.zeros((N,N), np.bool)         # True if i and j were a cherry in for their last TMRCA 
             f2_age=np.zeros((N,N), np.float64)
             tmrca=np.zeros((N,N), np.float64)         # TMRCA for i and j
-            this_tmrca, this_subclade=find_tmrca_and_subclade(tree)
+            this_tmrca, this_subclade=find_tmrca_and_subclade(tree, options)
             last_tree=tree
             
         # First find all the nearest neighbour nodes on this tree
@@ -82,19 +87,18 @@ def main(options):
         internal_nodes=tree.get_nonterminals()
 
         last_tmrca, last_subclade=this_tmrca, this_subclade
-        this_tmrca, this_subclade=find_tmrca_and_subclade(tree)
-
+        this_tmrca, this_subclade=find_tmrca_and_subclade(tree, options)
         for node_1 in terminal_nodes:
-            label_1=int(node_1.confidence)
+            label_1=conf2label(node_1.confidence, options)
             for node_2 in terminal_nodes:
-                label_2=int(node_2.confidence)
+                label_2=conf2label(node_2.confidence, options)
                 if label_1>=label_2:
                     continue
 
                 # this_tmrca=tree.distance(node_1, node_2)/2
                 tmrca_change=np.abs(this_tmrca[label_1,label_2]-last_tmrca[label_1, label_2])
 
-                if tmrca_change>EPS1:
+                if tmrca_change>options["eps"]:
                     if is_f2[label_1, label_2]:
                         write_line([label_1, label_2, last_change[label_1,label_2], pos[i], f2_age[label_1,label_2]], out, options)
                         chunks+=1           
@@ -106,7 +110,7 @@ def main(options):
         # now, update cherries. 
         for node in internal_nodes:
             if node.is_preterminal(): 
-                labels=[int(x.confidence) for x in node.get_terminals()] 
+                labels=[conf2label(x.confidence, options) for x in node.get_terminals()] 
                 labels.sort()
                 is_f2[labels[0],labels[1]]=True
                 f2_age[labels[0],labels[1]]=this_tmrca[labels[0],labels[1]]
@@ -124,7 +128,7 @@ def main(options):
 
 ##########################################################################################################
 
-def clade_terminals_changed(tree, last_tree, label_1, label_2):
+def clade_terminals_changed(tree, last_tree, label_1, label_2, options):
     """
     Consider the set of terminal nodes of the minimal subclade containing both 
     label1 and label2. Are they the same for tree and last tree? - i.e. did we just 
@@ -136,26 +140,26 @@ def clade_terminals_changed(tree, last_tree, label_1, label_2):
     node_2=None
 
     for node in last_tree.get_terminals():
-        if int(node.confidence)==label_1:
+        if conf2label(node.confidence, options)==label_1:
             last_node_1=node
-        elif int(node.confidence)==label_2:
+        elif conf2label(node.confidence, options)==label_2:
             last_node_2=node
             
     for node in tree.get_terminals():
-        if int(node.confidence)==label_1:
+        if conf2label(node.confidence, options)==label_1:
             node_1=node
-        elif int(node.confidence)==label_2:
+        elif conf2label(node.confidence, options)==label_2:
             node_2=node
 
     last_subclade_nodes=last_tree.common_ancestor(last_node_1,last_node_2).get_terminals()
-    last_subclade_labels=set([int(x.confidence) for x in last_subclade_nodes])
+    last_subclade_labels=set([conf2label(x.confidence, options) for x in last_subclade_nodes])
     this_subclade_nodes=tree.common_ancestor(node_1,node_2).get_terminals()
-    this_subclade_labels=set([int(x.confidence) for x in this_subclade_nodes])
+    this_subclade_labels=set([conf2label(x.confidence, options) for x in this_subclade_nodes])
     return last_subclade_labels != this_subclade_labels
     
 ##########################################################################################################
 
-def find_tmrca_and_subclade(tree):
+def find_tmrca_and_subclade(tree, options):
     """
     This finds both the tmrca of each pair of nodes, and the set of node labels which 
     are in the subclade of each pair. i.e. all the terminal nodes of the mrca of the 
@@ -179,7 +183,7 @@ def find_tmrca_and_subclade(tree):
 
     for node in tree.get_nonterminals():
         leaves=node.get_terminals()
-        labels=set([int(x.confidence) for x in leaves] )
+        labels=set([conf2label(x.confidence, options) for x in leaves] )
         if len(leaves)==N:              # first(?) node is everything. 
             continue
         else:
@@ -197,6 +201,11 @@ def write_line(line, out, options):
     if line[3]-line[2]>0:          # if the chunk is >0 length
         output=[int(line[0]/2)+1, int(line[1]/2)+1, int(line[2]), int(line[3]), line[4]]
         out.write("\t".join([str(x) for x in output])+"\n") 
+
+##########################################################################################################
+
+def conf2label(conf, options):
+    return int(conf)-options["offset"]
 
 ##########################################################################################################
 

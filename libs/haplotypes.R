@@ -24,7 +24,7 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
   f2$chr <- chr
   f2$ID.from <- ifelse(pop.map[f2$ID1]==population, f2$ID1, f2$ID2)
   f2$ID.to <- ifelse(pop.map[f2$ID1]==population, f2$ID2, f2$ID1)
-  f2$ibd.len <- 0
+  f2$hap.len <- 0
   f2$hap.left <- 0
   f2$hap.right <- 0
   f2$f1 <- 0
@@ -60,14 +60,14 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     
     ibd <- find.inconsistent.hom(from.hap, to.hap, pos, this.pos, haplen)
     ibd.pos <- pos[ibd]
-    ibd.len <- ibd.pos[2]-ibd.pos[1]
+    hap.len <- ibd.pos[2]-ibd.pos[1]
 
     ## Note here for doubletons, we really mean >/< rather than >=/<=. However since the breakpoints are inconsistent homozygotes
     ## they can't be consistent doubletons so it doesn't matter and >/< handles the case where the f2 is at the end of the chrom. 
     singletons <- NROW(f1[(f1$ID1==this.ID.from|f1$ID1==this.ID.to) & f1$pos>ibd.pos[1] & f1$pos<ibd.pos[2],])
     doubletons <- NROW(f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>=ibd.pos[1] & f2$pos<=ibd.pos[2],])
     
-    f2$ibd.len[i] <- ibd.len
+    f2$hap.len[i] <- hap.len
     f2$hap.left[i] <- ibd.pos[1]
     f2$hap.right[i] <- ibd.pos[2]
     f2$f1[i] <- singletons
@@ -80,7 +80,7 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
   }
 
   ## Exclude samples which either hit the ends of the chromosome, or which have 0 length 
-  exclude <- (f2$ibd.len==0) | (f2$hap.right==max(pos)) | (f2$hap.left==min(pos))
+  exclude <- (f2$hap.len==0) | (f2$hap.right==max(pos)) | (f2$hap.left==min(pos))
   
   return(f2[!exclude,])
 }

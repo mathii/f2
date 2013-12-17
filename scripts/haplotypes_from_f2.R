@@ -24,6 +24,10 @@ samples <- scan(paste(hap.root, "/samples.txt", sep=""), quiet=TRUE, what="")
 sim.pop.map <- rep("ALL", length(samples))
 names(sim.pop.map) <- samples
 
-all.results <- find.haplotypes.from.f2(f1.file, f2.file, pos.file, by.sample.gt.root, sim.pop.map, "ALL", map.file, verbose=verbose)
+haps <- find.haplotypes.from.f2(f1.file, f2.file, pos.file, by.sample.gt.root, sim.pop.map, "ALL", map.file, verbose=verbose)
 
-write.table(all.results, out.file, row.names=FALSE, col.names=TRUE, quote=FALSE)
+## Just remove the ones with zero length.
+cat(paste0("Removed ", sum(haps$map.len>0), " haplotypes with length 0\n"))
+haps <- haps[haps$map.len>0,]
+
+write.table(haps, out.file, row.names=FALSE, col.names=TRUE, quote=FALSE)
