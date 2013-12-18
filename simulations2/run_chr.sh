@@ -86,7 +86,7 @@ zgrep "^1_" ${WD}/raw_fsc_data_1_1.arp.gz | cut -f3 | sed "s/[2-9]/1/g" | less |
 zgrep -A1 "polymorphic positions"  ${WD}/raw_fsc_data_1_1.arp.gz | tail -n1 |  sed "s/[#,]//g" > ${WD}/tmp.pos
 R --slave --args ${WD}/tmp.pos ${nbp} ${WD}/tmp2.pos < ${CD}/simulations2/convert_pos.R
 gzip -c ${WD}/tmp2.pos > ${WD}/snps.pos.txt.gz
-rm ${WD}/tmp.pos ${WD}/tmp.pos.2
+rm ${WD}/tmp.pos ${WD}/tmp2.pos
 
 # Parse the genotype data into the right format, by haplotypes etc... 
 python ${CD}/scripts/macs_genotype_to_hap_files.py -g ${WD}/genotypes.txt.gz \
