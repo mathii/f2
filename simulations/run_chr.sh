@@ -61,7 +61,7 @@ rho=`echo "4*$ne*0.00000001" | bc`
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # Uncomment this to simulate with the wrong map - overwrite the simulated map with the wrong one. 
-# R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
+# R --vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
 
 # 2) Simulate using macs 
 case $sim_type in
@@ -70,7 +70,7 @@ simple)
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
 simple_wrong_map)
-	R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
+	R --vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
@@ -137,7 +137,7 @@ ancient_split)
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
 ancient_split_wrong_map)
-	R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
+	R --vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
