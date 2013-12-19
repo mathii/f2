@@ -69,6 +69,12 @@ simple)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+simple_wrong_map)
+	R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
+	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
+	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+
 constant_rate)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${CD}/test/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
@@ -123,6 +129,15 @@ Ne_01)
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
         ;;
 ancient_split)
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.02 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+ancient_split_wrong_map)
+	R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
