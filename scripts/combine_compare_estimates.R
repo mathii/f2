@@ -14,6 +14,7 @@ if(length(args)==3){
   code.dir <- args[3]
   plots <- TRUE
   publication.plots <- FALSE
+  include.densities <- FALSE
 } else{
   stop("Need to specify 3 arguments")
 }
@@ -64,14 +65,15 @@ for(j in 1:6){
 }
 t.hats <- do.call("rbind", t.hats)
 
+denss <-rep(list(NA),6)
 ## save.image(paste(res.dir, "/ll_and_density_environment.Rdata", sep=""))
-
-cat("Sampling Densities\n")
-denss <- list()
-alpha <- round(0.05*NROW(matched))
-for(i in 1:6){
-  ## Lg and D are dummy entries... the ll matrix is the only information we use... 
-  denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=TRUE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mats[[i]])
+if(include.densities){
+    cat("Sampling Densities\n")
+    alpha <- round(0.05*NROW(matched))
+    for(i in 1:6){
+        ## Lg and D are dummy entries... the ll matrix is the only information we use... 
+        denss[[i]] <- estimate.t.density.mcmc(0*matched$map.len ,0*matched$f2, Ne, p.fun, verbose=TRUE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mats[[i]])
+    }
 }
 
 max.log <- max(logt.grid)
