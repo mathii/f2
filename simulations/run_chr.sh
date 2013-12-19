@@ -10,7 +10,13 @@
 CHR=$1
 nbp=$2
 sim_type=$3
-sleep_time=$4
+run_sim_type=$3
+wrong_map=""
+
+if [! -z $4]; then
+    wrong_map=$4
+    sim_type=${sim_type}_${wrong_map}
+fi
 
 ##############################################################################################################
 
@@ -21,7 +27,7 @@ MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
 SIMS_DIR=/data1/users/mathii/f2_sims/${sim_type}/chr${CHR}
 # Where is the recombination map, in impute format?
-HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
+HM2_MAP=~/recombination_map2/hm2/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
 CODE_DIR=~/f2/f2_age
 
@@ -60,22 +66,30 @@ rho=`echo "4*$ne*0.00000001" | bc`
 # 1) convert hms map to macs format
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
-# Uncomment this to simulate with the wrong map - overwrite the simulated map with the wrong one. 
-# R --vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.txt < ${CD}/scripts/convert_AA_maps_to_macs_format.R
+# 1a) If we are trying to simulate with the wrong map
+if [! -z ${wrong_map}]; then
+    case ${wrong_map} in
+	rm  ${MD}/map.txt
+	aa_map)
+	    R --vanilla --args "~/recombination_maps/aa/maps_chr_hg19.${CHR}.gz" ${MD}/map.txt \
+		< ${CD}/scripts/convert_AA_maps_to_macs_format.R
+	    ;;
+	decode_map)
+	    R --vanilla --args "~/recombination_maps/decode/maps_chr_hg19.${CHR}.gz" ${MD}/map.txt \
+		< ${CD}/scripts/convert_AA_maps_to_macs_format.R
+	    ;;
+	chimp_map)
+	    R --vanilla --args "~/recombination_maps/chimp_rescaled/rescaled_chr${CHR}.txt.gz" ${MD}/map.txt \
+		< ${CD}/scripts/convert_AA_maps_to_macs_format.R
+	    ;;
+fi
 
 # 2) Simulate using macs 
-case $sim_type in
-simple)
+case $run_sim_type in
+    simple)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
-simple_wrong_map)
-	R --vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.txt \
-	    < ${CD}/scripts/convert_AA_maps_to_macs_format.R
-	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
-	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
-	;;
-
 constant_rate)
 	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${CD}/test/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
