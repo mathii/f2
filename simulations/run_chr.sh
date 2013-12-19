@@ -60,8 +60,8 @@ rho=`echo "4*$ne*0.00000001" | bc`
 # 1) convert hms map to macs format
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
-echo $nhp > $RD/groups.txt
-echo "NA" > $RD/events.txt
+# Uncomment this to simulate with the wrong map - overwrite the simulated map with the wrong one. 
+# R--vanilla --args "~/aa_recombination_map/maps_chr_hg19.${CHR}.gz" ${MD}/map.tx
 
 # 2) Simulate using macs 
 case $sim_type in
