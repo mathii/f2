@@ -13,7 +13,7 @@ if(length(args)==3){
   res.dir <- args[2]
   code.dir <- args[3]
   plots <- TRUE
-  publication.plots <- FALSE
+  publication.plots <- TRUE
   include.densities <- FALSE
 } else{
   stop("Need to specify 3 arguments")
