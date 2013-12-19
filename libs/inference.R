@@ -13,7 +13,7 @@ library(gsl)
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
 ########################################################################################################
 
-loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.7){
+loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5){
   t1 <- 0
   
   if(all(is.na(error.params))){
@@ -23,8 +23,6 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
     lm=4*Ne*t*pf(t)
     s=error.params[1]
     mu=error.params[2]
-    ## print(c(Lg, r, lm, s, mu, r*log(lm), log(hyperg_1F1(r, r+s, Lg*(mu-lm)))))
-    ## print(c(r, s, mu, lm))
     t1 <- r*log(lm)+log(hyperg_1F1(r, r+s, Lg*(mu-lm)))
   }
   
@@ -276,7 +274,7 @@ confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, ma
 ## S.params
 ########################################################################################################
 
-MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.7, verbose=FALSE){
+MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.5, verbose=FALSE){
 
   nh <- NROW(haps)
   t.hat <- rep(0, nh)
@@ -285,7 +283,7 @@ MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, 
   for(j in 1:nh){
     if(verbose){cat(paste0("\r", j, "/", nh))}
     if(has.S.params){sp <- S.params[j,]}
-    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp)$maximum
+    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape)$maximum
   }
   if(verbose){cat("\rDone\n")}
   return(t.hat)

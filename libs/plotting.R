@@ -54,14 +54,14 @@ add.density.to.plot <- function(dens, true.age, qs=c(0.01,0.99), col="#E41A1C", 
 ## true.age: vector of length n with true ages in generations
 ############################################################################################################################
 
-plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15", cols="#377EBA", ...){
+plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15", cols="#377EBA", line.col="black",...){
   plot(log10(true.age), log10(t.hat), col=paste(cols, alpha, sep=""), bty="n", xlab="True age", ylab="Estimated age", pch=".", ...)
   qq.mle <- qqplot(log10(true.age), log10(t.hat), plot.it=FALSE)
   ## lines(qq.mle, col="white", lwd=3)
   range <- quantile(log10(true.age), c(0.01,0.99))
   include <- qq.mle$x>=range[1] & qq.mle$x<=range[2]
+  abline(0,1,col=line.col, lty=2, lwd=2)
   lines(qq.mle$x[include], qq.mle$y[include], col="#377EBA", lwd=2)
-  abline(0,1,col="black", lty=2, lwd=2)
   if(is.function(dens)){
       add.density.to.plot(dens, true.age, lwd=2)
   }
