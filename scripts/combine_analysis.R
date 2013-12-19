@@ -34,7 +34,7 @@ for(chr in chrs){
   cat(paste("\r", chr))
   load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
 
-  if(!exists("t.hats", envir=subenv)){   #backwards compatibility. 
+  if(is.null(subenv$t.hats)){   #backwards compatibility. 
     t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE)
   } else{
     t.hats[[i]] <- subenv$t.hats
