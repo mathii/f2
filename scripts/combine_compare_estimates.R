@@ -89,7 +89,7 @@ if(plots){dev.off()}
 
 if(publication.plots){
     for(i in 1:6){
-        png(paste0(res.dir, "estimate." labels[i], ".png"), height=600, width=600)
+        png(paste0(res.dir, "estimate.", labels[i], ".png"), height=600, width=600)
         plot.mle.and.density(matched$Age, t.hats[,i], NA, xlim=c(0,max.log), ylim=c(0,max.log), cex=2, alpha="10", col="grey")
     }
 }
