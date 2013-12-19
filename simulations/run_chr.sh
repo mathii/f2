@@ -13,7 +13,7 @@ sim_type=$3
 run_sim_type=$3
 wrong_map=""
 
-if [ -n $4]; then
+if [ -n $4 ]; then
     wrong_map=$4
     sim_type=${sim_type}_${wrong_map}
 fi
@@ -65,9 +65,9 @@ rho=`echo "4*$ne*0.00000001" | bc`
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # 1a) If we are trying to simulate with the wrong map
-if [ -n ${wrong_map}]; then
+if [ -n ${wrong_map} ]; then
+    rm  ${MD}/map.txt
     case ${wrong_map} in
-	rm  ${MD}/map.txt
 	aa_map)
 	    R --vanilla --args "~/recombination_maps/aa/maps_chr_hg19.${CHR}.gz" ${MD}/map.txt \
 		< ${CD}/scripts/convert_AA_maps_to_macs_format.R
