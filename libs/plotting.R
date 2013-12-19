@@ -62,7 +62,9 @@ plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15", cols="#377EB
   include <- qq.mle$x>=range[1] & qq.mle$x<=range[2]
   lines(qq.mle$x[include], qq.mle$y[include], col="#377EBA", lwd=2)
   abline(0,1,col="black", lty=2, lwd=2)
-  add.density.to.plot(dens, true.age, lwd=2)
+  if(is.function(dens)){
+      add.density.to.plot(dens, true.age, lwd=2)
+  }
 }
 
 ############################################################################################################################
