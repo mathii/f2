@@ -80,6 +80,7 @@ if [ -n ${wrong_map} ]; then
 	    R --vanilla --args "~/recombination_maps/chimp_rescaled/rescaled_chr${CHR}.txt.gz" ${MD}/map.txt \
 		< ${CD}/scripts/convert_AA_maps_to_macs_format.R
 	    ;;
+    esac
 fi
 
 # 2) Simulate using macs 
