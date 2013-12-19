@@ -61,6 +61,7 @@ plot.mle.and.density <- function(true.age, t.hat, dens, alpha="15", cols="#377EB
   range <- quantile(true.age, c(0.01,0.99))
   include <- qq.mle$x>=range[1] & qq.mle$x<=range[2]
   abline(0,1,col=line.col, lty=2, lwd=2)
+  lines(qq.mle$x[include], qq.mle$y[include], col="white", lwd=3)
   lines(qq.mle$x[include], qq.mle$y[include], col="#377EBA", lwd=2)
   if(is.function(dens)){
       add.density.to.plot(dens, true.age, lwd=2)

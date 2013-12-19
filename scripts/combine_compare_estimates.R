@@ -81,7 +81,7 @@ labels=c("True (Lg)", "Observed (Lg)", "Corrected (Lg)", "True (Lg+S)", "Observe
 if(plots){png(paste(res.dir, "/compare_estimates.png", sep=""), height=1200, width=1800)}else{dev.new()}
 par(mfrow=c(2,3))
 for(i in 1:6){
-  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,10^max.log), ylim=c(0,10^max.log), cex=2, alpha="10")
+    plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,10^max.log), ylim=c(0,10^max.log), cex=2, alpha="10")
 }
 if(plots){dev.off()}
 
@@ -96,6 +96,7 @@ if(publication.plots){
         dev.off()
     }
     png(paste0(res.dir, "/Figure2a.png"), height=600, width=600)
+    options(scipen = 50)
     plot.mle.and.density(matched$Age, t.hats[,i], NA, xlim=c(1,10^4), ylim=c(1,10^4), cex=2, alpha="10", col="#101010", line.col="red")
     dev.off()
 
