@@ -30,6 +30,7 @@ logt.grid=NULL
 
 ll.mats.by.class <- list()
 haps.by.class <- list()
+t.hats.by.class <- list()
 
 classes <- c("lof", "coding", "noncoding")
 ns <- rep(0,2*length(classes))
@@ -37,28 +38,29 @@ ns <- rep(0,2*length(classes))
 for( cls in classes){
 
   haps <- list()
-  ll.mat <- list()
-
+  t.hats <- list()
+  
   ## load saved results
   cat("Loading data\n")
   i=1
   for(chr in chrs){
     cat(paste("\r", chr))
     load(paste0(chr.res.dir, "/chr", chr, "/", cls, "/results/ll_environment.Rdata"), envir=subenv)
-    ll.mat[[i]] <- subenv$ll.mat
 
     haps[[i]] <- subenv$haps  
-    if(i==1){
-      logt.grid <- subenv$logt.grid
-    }else if (!all(subenv$logt.grid==logt.grid)){
-      stop("grids do not match")
-    }
+
+  if(is.null(subenv$t.hats)){   #backwards compatibility. 
+      t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE)
+  } else{
+      t.hats[[i]] <- subenv$t.hats
+  }
+    
     i=i+1
   }
   cat("\n")
 
-  ll.mats.by.class[[cls]] <- do.call("rbind", ll.mat)
   haps.by.class[[cls]] <- do.call("rbind", haps)
+  t.hats.by.class[[cls]] <- do.call("c", t.hats)
 }
 
 
@@ -69,7 +71,6 @@ for( cls in classes){
 i=1
 for(cls in classes){
   haps <- haps.by.class[[cls]]
-  ll.mat <- ll.mats.by.class[[cls]]
   
   ID1.pop <- pop.map[haps$ID1]
   ID2.pop <- pop.map[haps$ID2]
@@ -77,14 +78,11 @@ for(cls in classes){
   within <- ID1.pop==ID2.pop
   between <- !within
 
-  alpha.w <- round(0.05*sum(within))
-  alpha.b <- round(0.05*sum(between))
+  dw <- density(log10(t.hats.by.class[[cls]][within]))
+  db <- density(log10(t.hats.by.class[[cls]][between]))
   
-  dens.w <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.w,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[within,], return.density.only=FALSE)
-  dens.b <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha.b,error.params=NA, n.sims=10000, thin=100, ll.mat=ll.mat[between,], return.density.only=FALSE)
-
-  densities[[i]] <- dens.w$density
-  densities[[i+length(classes)]] <- dens.b$density
+  densities[[i]] <- approxfun(dw, rule=2)
+  densities[[i+length(classes)]] <- approxfun(db, rule=2)
 
   ns[i] <- sum(within)
   ns[i+length(classes)] <- sum(between)
