@@ -22,6 +22,7 @@ if(length(args)==7){
   bins <- as.numeric(args[7])
   plots <- TRUE
   verb <- FALSE
+  publication.plots <- TRUE
 } else{
   stop("Need to specify 7 arguments")
 }
@@ -73,7 +74,7 @@ S.params.true$Ep <-  S.params.true$Lp*(theta.estimates[matched$ID1]+theta.estima
 
 cat("Calculating MLE\n")
 for(j in 1:NROW(matched)){
-  ## cat(paste("\r", j))
+  cat(paste("\r", j))
   ## Using true values
   max.search <- (10^max.log)/2/Ne
   t.hats[j,1] <- 2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=matched$true.map[j]/100,  Ne=Ne, pf=p.fun, D=matched$f2[j], error.params=NA)$maximum
@@ -93,7 +94,7 @@ cat("\rCalculating ll matrices\n")
 
 norm.2.p <- function(x){return(dnorm(x, mean=2))}
 
-denss <- list()
+denss <- rep(list(NA),6)
 ll.mats <- list()
 ll.mats[[1]] <- compute.ll.matrix( matched$true.map/100, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=verb)
 ll.mats[[2]] <- compute.ll.matrix( matched$map.len, matched$f2, Ne, p.fun, logt.grid=logt.grid, error.params=NA, S.params=NA, verbose=verb)
@@ -115,9 +116,18 @@ labels=c("True (Lg)", "Observed (Lg)", "Corrected (Lg)", "True (Lg+S)", "Observe
 if(plots){pdf(paste(res.dir, "/compare_estimates.pdf", sep=""), height=12, width=18)}else{dev.new()}
 par(mfrow=c(2,3))
 for(i in 1:6){
-  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(0,max.log), ylim=c(0,max.log))
+  plot.mle.and.density(matched$Age, t.hats[,i], denss[[i]], main=labels[i], xlim=c(1,10^max.log), ylim=c(1,10^max.log))
 }
 if(plots){dev.off()}
+
+if(publication.plots){
+    for(i in 1:6){
+        png(paste0(res.dir, "/estimate.", labels[i], ".png"), height=600, width=600)
+        plot.mle.and.density(matched$Age, t.hats[,i], NA, xlim=c(1,10^max.log), ylim=c(1,10^max.log), cex=2, alpha="40", col="#101010", line.col="red")
+        dev.off()
+    }
+}
+
 
 if(plots){pdf(paste(res.dir, "/coverage.pdf", sep=""), height=6, width=6)}else{dev.new()}
 plot.coverage.curves(matched$Age, t.hats, labels=labels, lty=rep(1,6), lwd=1, cols=c("black", brewer.pal(5, "Set1")))
