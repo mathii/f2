@@ -32,7 +32,7 @@ ll.mats.by.class <- list()
 haps.by.class <- list()
 t.hats.by.class <- list()
 
-classes <- c("lof", "coding", "noncoding")
+classes <- c("lof", "coding", "noncoding", "intergenic")
 ns <- rep(0,2*length(classes))
 
 for( cls in classes){
@@ -94,13 +94,14 @@ for(cls in classes){
   i=i+1
 }
 
+pdf(paste0(res.dir, "functional_distribution.pdf"))
 col=c(rep("#377EBA", 3), rep("#E41A1C", 3))
 border=col
 fill=paste0(col, "80")
-x.pos=c(1.25,2.25,3.25,4.75,5.75,6.75)
+x.pos=c(1.25,2.25,3.25,4.25, 5.75,6.75,7.75, 8.75)
 
-viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding"),2), xlim=c(1,7), ylab=expression(Age~(Log[10]~generations)), scale=0.25 )
-abline(v=4, lty=3)
+viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding", "Intergenic"),2), xlim=c(1,9), ylab=expression(Age~(Log[10]~generations)), scale=0.25 )
+abline(v=5, lty=3)
 mtext(paste0("(",format(ns, big.mark=",", trim=TRUE),")"), 1, at=x.pos, line=1)
-mtext(c("Within population", "Between populations"), 3, at=c(2.25, 5.75), line=0)
-
+mtext(c("Within population", "Between populations"), 3, at=c(2.75, 6.25), line=0)
+dev.off()
