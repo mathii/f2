@@ -66,7 +66,8 @@ for( cls in classes){
 
 ## the following is cnp'd from run_1kg_analysis_chr.R.
 ## estimate densities, by class for within/between.
-## densities <- list()
+densities <- list()
+values <- list()
 
 i=1
 for(cls in classes){
@@ -84,6 +85,9 @@ for(cls in classes){
   densities[[i]] <- approxfun(dw, rule=2)
   densities[[i+length(classes)]] <- approxfun(db, rule=2)
 
+  values[[i]] <- log10(t.hats.by.class[[cls]][within])
+  values[[i+length(classes)]] <- log10(t.hats.by.class[[cls]][between])
+  
   ns[i] <- sum(within)
   ns[i+length(classes)] <- sum(between)
 
@@ -95,7 +99,7 @@ border=col
 fill=paste0(col, "80")
 x.pos=c(1.25,2.25,3.25,4.75,5.75,6.75)
 
-viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding"),2), xlim=c(1,7), ylab=expression(Age~(Log[10]~generations)) )
+viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding"),2), xlim=c(1,7), ylab=expression(Age~(Log[10]~generations)), scale=0.25 )
 abline(v=4, lty=3)
 mtext(paste0("(",format(ns, big.mark=",", trim=TRUE),")"), 1, at=x.pos, line=1)
 mtext(c("Within population", "Between populations"), 3, at=c(2.25, 5.75), line=0)

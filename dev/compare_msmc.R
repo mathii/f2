@@ -31,7 +31,7 @@ t.hats<-MLE.from.haps(matched[between,], Ne, S.params=S.params[between,], error.
 t.hat.dens <- density(log10(t.hats))
 
 par(mar=c(5.1,4.1,2.1,4.1))
-plot(msmc$left_time_boundary/1.2e-8, 2*msmc$lambda_01/(msmc$lambda_00+msmc$lambda_11), type="s", log="x", ylim=c(0,1), xlim=c(100,10000), bty="n", xlab="Generations", ylab="MSMC gene flow estimate", col="#E41A1C", yaxt="n", main=sim.type)
+plot(msmc$left_time_boundary/1.2e-8, 2*msmc$lambda_01/(msmc$lambda_00+msmc$lambda_11), type="s", log="x", ylim=c(0,1), xlim=c(100,10000), bty="n", xlab="Generations", ylab="MSMC gene flow estimate", col="#E41A1C", yaxt="n", main="")
 axis(2, col="#E41A1C")
 scale <- max(t.hat.dens$y)
 lines(10^t.hat.dens$x, t.hat.dens$y/scale, col="#377EBA")

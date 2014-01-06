@@ -48,7 +48,7 @@ exec > ${LOG} 2>&1
 theta=`echo "4*$ne*$mu" | bc`
 
 sleep ${CHR} # just so we don't all start at the same time
-for func in lof coding noncoding
+for func in lof coding noncoding intergenic
 do
     echo ${func}
     FTH=${SIMS_DIR}/${func}/haplotypes

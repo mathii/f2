@@ -29,7 +29,6 @@ if(TRUE ){
   for(chr in chrs){
     cat(paste("\r", chr))
     load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
-    ll.mat[[i]] <- subenv$ll.mat
 
     haps <- subenv$haps
 

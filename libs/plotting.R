@@ -137,9 +137,11 @@ plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:
   at=c(10^floor(xlim[1]))
   for(int in seq(floor(xlim[1]), floor(xlim[2]-1))){
     at=c(at, 10^int*(2:10))
-    mtext(bquote(10^.(int)), 1, at=10^int, line=1)
-  }
-  mtext(bquote(10^.(int+1)), 1, at=10^(int+1), line=1)
+    ## mtext(bquote(10^.(int)), 1, at=10^int, line=1)
+    mtext(format(10^int, big.mark=",", scientific=10), 1, at=10^int, line=1)
+}
+  ## mtext(bquote(10^.(int+1)), 1, at=10^(int+1), line=1)
+  mtext(format(10^(int+1), big.mark=",", scientific=10), 1, at=10^(int+1), line=1)
   axis(1, at=at, label=FALSE)
   
   if(n>1){

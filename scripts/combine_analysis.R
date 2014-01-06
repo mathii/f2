@@ -70,3 +70,4 @@ legend.order=order(match(populations, l.o))
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,2), legend.order=legend.order )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)
 
+
