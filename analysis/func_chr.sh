@@ -37,7 +37,7 @@ RD=${SIMS_DIR}/results
 CD=${CODE_DIR}
 PATH_TO_FUNC=/data1/users/mathii/1000g/data/func/ # ALL_XX_pos.txt.gz where XX=coding,noncoding and lof
 
-for dir in ${SIMS_DIR}/coding ${SIMS_DIR}/noncoding ${SIMS_DIR}/lof
+for dir in ${SIMS_DIR}/coding ${SIMS_DIR}/noncoding ${SIMS_DIR}/lof ${SIMS_DIR}/intergenic
 do
     mkdir -p ${dir}/haplotypes
     mkdir -p ${dir}/results
