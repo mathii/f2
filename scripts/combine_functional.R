@@ -101,7 +101,7 @@ col=c(rep("#377EBA", 4), rep("#E41A1C", 4))
 border=col
 fill=paste0(col, "80")
 x.pos=c(1.25,2.25,3.25,4.25, 5.75,6.75,7.75, 8.75)
-viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding", "Intergenic"),2), xlim=c(1,9), ylab=expression(Age~(Log[10]~generations)), scale=0.25 )
+viola.plot(densities, x.pos=x.pos, eps=2e-2, col=col, border=border, fill=fill, labels=rep(c("LOF", "Coding", "Noncoding", "Intergenic"),2), xlim=c(1,9), ylab=expression(Age~(Log[10]~generations)), scale=0.4 )
 abline(v=5, lty=3)
 mtext(paste0("(",format(ns, big.mark=",", trim=TRUE),")"), 1, at=x.pos, line=1)
 mtext(c("Within population", "Between populations"), 3, at=c(2.75, 7.25), line=0)

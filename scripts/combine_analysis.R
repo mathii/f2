@@ -43,9 +43,10 @@ for(chr in chrs){
   haps[[i]] <- subenv$haps
   i=i+1
 }
+
 cat("\n")
 rm(subenv)
-t.hats <- do.call("rbind", t.hats)
+t.hats <- do.call("c", t.hats)
 haps <- do.call("rbind", haps)
 
 ## the following is cnp'd from run_1kg_analysis_chr.R.
