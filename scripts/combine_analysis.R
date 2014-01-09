@@ -35,12 +35,13 @@ for(chr in chrs){
   load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
 
   if(is.null(subenv$t.hats)){   #backwards compatibility. 
-    t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE)
+    t.hats[[i]] <- MLE.from.haps(subenv$haps, subenv$Ne,S.params=subenv$S.params,  error.params=subenv$error.params, verbose=TRUE, tol=1e-10)
   } else{
     t.hats[[i]] <- subenv$t.hats
   }
      
   haps[[i]] <- subenv$haps
+  i=i+1
 }
 cat("\n")
 rm(subenv)
@@ -66,7 +67,7 @@ for(i in 1:(npop)){
 l.o <- c("ASW", "LWK", "YRI", "CLM", "MXL", "PUR",  "CHB", "CHS", "JPT", "CEU", "FIN", "GBR", "IBS", "TSI")
 legend.order=order(match(populations, l.o))
 
-## plots. One plot of all within-group densities, and one of all densities in total.
+plots. One plot of all within-group densities, and one of all densities in total.
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,2), legend.order=legend.order )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)
 
