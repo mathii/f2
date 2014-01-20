@@ -156,6 +156,7 @@ find.haplotypes.from.fn <- function( fn.file, pos.file, by.sample.gt.root, pop.m
     last.ibd.pos <- ibd.pos
   }
 
+  results <- cbind(results, result.ids)
   exclude <- (results$hap.len==0) | (results$hap.right==max(pos)) | (results$hap.left==min(pos))
   
   return(results[!exclude,])
