@@ -45,6 +45,13 @@ exec > ${LOG} 2>&1
 # assume that run_chr has already been run. 
 
 # 1.3) Sequence data - extract variants, find and date haplotypes
+# for comparison, do n=2 in the same way - sanity, check it agrees
+# with the full f2 analysis
+n=2
+R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} \
+    ${HM2_MAP} 1 ${n} ${ne} < ${CD}/scripts/haplotypes_from_fn.R
+gzip -f ${RD}/f${n}_results.txt 
+
 for n in 3 4 5
 do
    ${VCFTOOLS} --gzvcf ${path_to_seq_data}  --out ${TH}/chr${CHR}.f${n}.log.tmp \
@@ -56,7 +63,7 @@ do
        -o ${TH}/pos.idx.f${n}.gz -n $n > ${TH}/pos.idx.f${n}.tmp.log 
 
    R --vanilla --quiet --slave --args ${CD} ${TH} ${RD} \
-       ${HM2_MAP} 0 ${n} ${ne} < ${CD}/scripts/haplotypes_from_fn.R
+       ${HM2_MAP} 1 ${n} ${ne} < ${CD}/scripts/haplotypes_from_fn.R
    gzip -f ${RD}/f${n}_results.txt 
 done
 

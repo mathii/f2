@@ -35,7 +35,7 @@ names(sim.pop.map) <- samples
 haps <- find.haplotypes.from.fn(fn.file, pos.file, by.sample.gt.root, sim.pop.map, "ALL", map.file, verbose=verbose)
 
 ## Just remove the ones with zero genetic length.
-cat(paste0("Removed ", sum(haps$map.len>0), " haplotypes with length 0\n"))
+cat(paste0("Removed ", sum(haps$map.len==0), " haplotypes with length 0\n"))
 haps <- haps[haps$map.len>0,]
 
 ## estuimate ages

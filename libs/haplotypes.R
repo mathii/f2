@@ -120,7 +120,7 @@ find.haplotypes.from.fn <- function( fn.file, pos.file, by.sample.gt.root, pop.m
   n.comp <- n*(n-1)/2
   
   last.ibd.pos <- c(-1,-1)
-  last.ids <- c(-1,-1)
+  last.ids <- c(-1,-2)
   for(i in 1:number.fn){
     if(verbose){cat(paste("\rChr", chr, " (", i, "/", number.fn,") ", sep=""))}
     this.pos <- fn$pos[i]
@@ -129,7 +129,8 @@ find.haplotypes.from.fn <- function( fn.file, pos.file, by.sample.gt.root, pop.m
     #skip if fn in single indiviudal.
     if(any(duplicated(these.ids))){next}
     #skip if still in the previous chunk - relies on the data being odered as above
-    if(this.pos<last.ibd.pos[2] & any(duplicated(c(these.ids, last.ids)))){next}       
+    if(this.pos<last.ibd.pos[2] & this.pos>last.ibd.pos[1] & any(duplicated(c(these.ids, last.ids)))){
+      next    }       
     these.ibds <- matrix(0,nrow=n.comp, ncol=2)
     i.comp <- 1
     for(i1 in 1:(n-1)){
