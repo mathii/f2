@@ -105,7 +105,7 @@ find.haplotypes.from.fn <- function( fn.file, pos.file, by.sample.gt.root, pop.m
 
   mapfn <- get.mapfn(map.file)
     
-  fn <- fn[pop.map[f2$ID1]==population|pop.map[f2$ID2]==population,]
+  fn <- fn[pop.map[fn$ID1]==population|pop.map[fn$ID2]==population,]
   fn <- fn[order(fn$ID1,fn$ID2),]
 
   number.fn <- NROW(fn)
@@ -126,7 +126,7 @@ find.haplotypes.from.fn <- function( fn.file, pos.file, by.sample.gt.root, pop.m
     this.pos <- fn$pos[i]
     these.ids <- fn[i,2:(n+1)]
     
-    #skip if f2 in single indiviudal.
+    #skip if fn in single indiviudal.
     if(any(duplicated(these.ids))){next}
     #skip if still in the previous chunk - relies on the data being odered as above
     if(this.pos<last.ibd.pos[2] & any(duplicated(c(these.ids, last.ids)))){next}       
