@@ -37,8 +37,8 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
   }
   ## print(c(t1,t2))
   ## bit hacky until we figure out how to deal with this underflow...
-  if(t1+t2< -1e4){                       #This should be small enough!
-    return(-1e4-t)
+  if(t1+t2< -1e8){                       #This should be small enough!
+    return(-1e8-t)
   }
   return(t1+t2)
 }
@@ -274,7 +274,7 @@ confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, ma
 ## S.params
 ########################################################################################################
 
-MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.5, verbose=FALSE){
+MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.5, verbose=FALSE, tol=1/2/Ne){
 
   nh <- NROW(haps)
   t.hat <- rep(0, nh)
@@ -283,7 +283,7 @@ MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, 
   for(j in 1:nh){
     if(verbose){cat(paste0("\r", j, "/", nh))}
     if(has.S.params){sp <- S.params[j,]}
-    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape)$maximum
+    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape, tol=tol)$maximum
   }
   if(verbose){cat("\rDone\n")}
   return(t.hat)
