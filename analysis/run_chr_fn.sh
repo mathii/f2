@@ -26,7 +26,7 @@ PANEL=${CODE_DIR}/analysis/1kg_panel.txt
 SETUP_FILE=${CODE_DIR}/analysis/1kg_setup.R
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
-ne=185000
+ne=24000
 mu=0.000000004
 
 ##############################################################################################################

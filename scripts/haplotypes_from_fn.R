@@ -38,8 +38,10 @@ haps <- find.haplotypes.from.fn(fn.file, pos.file, by.sample.gt.root, sim.pop.ma
 cat(paste0("Removed ", sum(haps$map.len==0), " haplotypes with length 0\n"))
 haps <- haps[haps$map.len>0,]
 
-## estuimate ages
-t.hats <- MLE.from.haps(haps, Ne, S.params=NA,  error.params=error.params, verbose=TRUE)
+## from the coalescent_fns.R file - need to compute for higher n
+qns <- list(function(t){1}, q2, q3, q4, q5)
+## estimate ages
+t.hats <- MLE.from.haps(haps, Ne, S.params=NA,  error.params=error.params, verbose=TRUE, p.fun=qns[[n]])
 
 haps <- cbind(haps, t.hat=t.hats)
 
