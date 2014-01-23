@@ -174,7 +174,7 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 ## res.dir: directory to output results. if NULL then open windows. 
 ############################################################################################################################
 
-density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), ...){
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), prefix="", ...){
   plots <- !is.null(res.dir)
   npop <- length(populations)
   
@@ -194,7 +194,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
   }
     names(between.list) <- populations
 
-    if(plots){pdf(paste(res.dir, "/between_", populations[i], ".pdf", sep=""))}else{dev.new()}
+    if(plots){pdf(paste(res.dir, "/", prefix , "between_", populations[i], ".pdf", sep=""))}else{dev.new()}
     plot.densities(between.list, grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order,  xlim=xlim, ylim=ylim, ...)
     if(plots){dev.off()}
   }
@@ -223,7 +223,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
 ## res.dir: directory to ouput results
 ############################################################################################################################
 
-haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.order=(1:length(populations))){
+haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.order=(1:length(populations)), prefix=""){
    npop <- length(populations)
    counts <- matrix(0, npop, npop)
    for(i in 1:npop){
@@ -232,8 +232,8 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
      }
    }
    colnames(counts) <- rownames(counts) <- populations
-   write.table(counts[legend.order,legend.order], paste(res.dir, "/counts.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
-   res.to.latextab(counts[legend.order,legend.order], paste(res.dir, "/counts.latextab.txt", sep=""))
+   write.table(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+   res.to.latextab(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.latextab.txt", sep=""))
 }
 
 ############################################################################################################################
