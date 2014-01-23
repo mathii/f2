@@ -183,7 +183,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
     within.list[[i]] <- densities[[i]][[i]]
   }
   names(within.list) <- populations
-  if(plots){pdf(paste(res.dir, "/within.pdf", sep=""))}else{dev.new()}
+  if(plots){pdf(paste(res.dir, "/", prefix, "within.pdf", sep=""))}else{dev.new()}
   plot.densities(within.list, grid, cols=pop.cols[populations], main="within", legend.order=legend.order, xlim=xlim, ylim=ylim, ...)
   if(plots){dev.off()}
   
@@ -210,8 +210,8 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
       }
       
       colnames(res) <- rownames(res) <- populations
-      write.table(res[legend.order,legend.order], paste(res.dir, "/q", round(q*100), ".txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
-      res.to.latextab(res[legend.order,legend.order], paste(res.dir, "/q", round(q*100), ".latextab.txt", sep=""))
+      write.table(res[legend.order,legend.order], paste(res.dir, "/", prefix, "q", round(q*100), ".txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+      res.to.latextab(res[legend.order,legend.order], paste(res.dir, "/", prefix, "q", round(q*100), ".latextab.txt", sep=""))
     }
   }
 }
