@@ -66,8 +66,14 @@ for(f in 2:5){
     for(i in 1:(npop)){
         for(j in i:npop){
             include <- rep(FALSE, NROW(pops))
-            for(pp in 1:NROW(pops)){
-                include[pp] <- ( populations[i] %in% pops[pp,])& (populations[j] %in% pops[pp,])
+            if(i==j){
+                for(pp in 1:NROW(pops)){
+                    include[pp] <- sum(populations[i]==pops[pp,])>=2
+                }
+            } else{ 
+                for(pp in 1:NROW(pops)){
+                    include[pp] <- ( populations[i] %in% pops[pp,])& (populations[j] %in% pops[pp,])
+                }
             }
             dens <- density(log10(haps[[k]]$t.hat[include]))
             densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
