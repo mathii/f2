@@ -59,7 +59,7 @@ for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
     if(sum(include)>1){
-      dens <- density(log10(t.hats))
+      dens <- density(log10(t.hats[include]))
       densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
     }else{
       densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0*x)}

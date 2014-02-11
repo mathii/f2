@@ -1,41 +1,45 @@
 ## plot the median in bins along one chromosome.
 code.dir <- "~/f2_age/code/"
 path.to.results <- "~/f2_age/1000g/results/"
-source(paste0(code.dir, "analysis/1kgsetup.R"))
+source(paste0(code.dir, "analysis/1kg_setup.R"))
+source(paste0(code.dir, "libs/include.R"))
 
 ## Which CHR?
-chrs <- c(8:9)
-bin.w <- 10e6
+chrs <- c(9)
+bin.w <- 1e6
+
+## Which pops?
+pops.include <- list("CEU"=c("CEU", "GBR", "FIN", "IBS", "TSI"), "ASN"=c("CHB", "CHS", "JPT"), "AFR"=c("YRI", "LWK")) 
 
 start <- 0
 end <- 150e6
 
 bins.l <- seq(start, end, bin.w)
 bins.r <- c(bins.l[2:length(bins.l)], Inf)
-medians <- matrix(NA, nrow=length(chrs), ncol=length(bins.l))
-  
+medians <- matrix(NA, nrow=length(pops.include), ncol=length(bins.l))
+
+
+
 for(k in 1:length(chrs)){
   chr <- chrs[k]
   load(paste0(path.to.results, "/chr", chr, "/results/ll_environment.Rdata"))
   ## dyn.load(paste0(code.dir, "/libs/inference.so"))
-  
+  these.t.hats <-  MLE.from.haps(haps, Ne, S.params,  error.params, verbose=TRUE, tol=1e-10)
   for( i in 1:length(bins.l)){
-    cat(paste0("Iteration", i, "\n"))  
-    include <- haps$hap.left>=bins.l[i] & haps$hap.right<bins.r[i]
-    if(sum(include)>100){
-      alpha <- round(0.05*sum(include))
-      dens <- estimate.t.density.mcmc(0 ,0, Ne, p.fun, verbose=FALSE, logt.grid=logt.grid, prior=norm.2.p, alpha=alpha,error.params=NA, n.sims=1000, thin=10, ll.mat=ll.mat[include,])
-      medians[k,i] <- quantile.density(dens, 0.5)
-    }
+      include <- haps$hap.left>=bins.l[i] & haps$hap.right<bins.r[i]
+      for(j in 1:length(pops.include)){          
+          this.include <- pop.map[haps$ID1] %in% pops.include[[j]] & pop.map[haps$ID2] %in% pops.include[[j]]
+      medians[j,i] <- median(these.t.hats[include & this.include])
+      }
   }  
 }
 
-cols <- rainbow(length(chrs))
-## cols <- c("red", "blue")
-plot(bins.l, medians[1,], type="s", xlab="Position", ylab="Median", bty="n", col=cols[1], ylim=c(2.1,2.4), xlim=c(0,150e6))
-if(length(chrs)>1){
-  for(j in 2:length(chrs)){
+## cols <- rainbow(length(chrs))
+cols <- c("blue", "darkgreen", "brown")
+plot(bins.l, medians[1,], log="y", type="s", xlab="Position", ylab="Median", bty="n", col=cols[1], ylim=c(100,4000))
+if(length(pops.include)>1){
+  for(j in 2:length(pops.include)){
     lines(bins.l, medians[j,], type="s", col=cols[j])
   }
 }
-legend("topleft", paste0("Chromosome ", chrs), col=cols, lty=1, bty="n")
+legend("topleft", names(pops.include), col=cols, lty=1, bty="n")
