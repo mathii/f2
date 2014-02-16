@@ -39,7 +39,8 @@ for(chr in chrs){
   } else{
     t.hats[[i]] <- subenv$t.hats
   }
-     
+
+  subenv$haps$chr <- chr
   haps[[i]] <- subenv$haps
   i=i+1
 }
