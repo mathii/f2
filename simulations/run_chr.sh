@@ -62,6 +62,9 @@ theta=`echo "4*$ne*$mu" | bc`
 rho=`echo "4*$ne*0.00000001" | bc`
 
 # 1) convert hms map to macs format
+if [ ${sim_type} -eq "constant_map"]; then
+    HM2_MAP=${CD}/test/constant_map.txt.gz
+fi
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # 1a) If we are trying to simulate with the wrong map
