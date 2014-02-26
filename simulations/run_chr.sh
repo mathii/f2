@@ -13,8 +13,7 @@ sim_type=$3
 run_sim_type=$3
 wrong_map=""
 
-if [ -n $4 ]; then
-    echo "foo"
+if [ -n "$4" ]; then
     wrong_map=$4
     sim_type=${sim_type}_${wrong_map}
 fi
