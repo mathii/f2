@@ -68,7 +68,7 @@ fi
 R --vanilla --args ${HM2_MAP} ${MD}/map.txt ${MD}/cut.map.txt < ${CD}/scripts/convert_HM_maps_to_macs_format.R
 
 # 1a) If we are trying to simulate with the wrong map
-if [ -n ${wrong_map} ]; then
+if [ -n "${wrong_map}" ]; then
     rm  ${MD}/map.txt
     case ${wrong_map} in
 	aa_map)
