@@ -44,7 +44,7 @@ d) HM2_MAP you can ignore for now.
 
 3) Then run test as follows:
 
-> run_chr CONST 1000000 constant_rate 0
+> run_chr CONST 1000000 constant_rate
 
 This should generate a bunch of subdirectories in 
 "dir_to_put_simulations/constant_rate/CONST" - check that there are
