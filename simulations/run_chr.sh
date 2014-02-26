@@ -13,7 +13,7 @@ sim_type=$3
 run_sim_type=$3
 wrong_map=""
 
-if [ -n $4 ]; then
+if [ -n "$4" ]; then
     wrong_map=$4
     sim_type=${sim_type}_${wrong_map}
 fi
@@ -93,7 +93,7 @@ case $run_sim_type in
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
 constant_rate)
-	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R${MD}/map.txt 2> \
+	${MACS_DIR}/macs ${nhp} ${nbp} -T -t ${theta} -r ${rho} -h 1e3 -R ${MD}/map.txt 2> \
 	    ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
 expanding)
