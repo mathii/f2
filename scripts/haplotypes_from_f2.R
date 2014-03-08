@@ -29,16 +29,19 @@ sim.pop.map <- rep("ALL", length(samples))
 names(sim.pop.map) <- samples
 
 if(n.cores==1){
-    haps <- find.haplotypes.from.f2(f1.file, f2.file, pos.file, by.sample.gt.root, sim.pop.map, "ALL", map.file, verbose=verbose)
+    haps <- find.haplotypes.from.f2(f1.file, f2.file, pos.file, by.sample.gt.root, sim.pop.map, map.file, verbose=verbose)
 }else{
     require(multicore)
     pos <- scan(pos.file, quiet=TRUE)
-    breaks <- seq(range(pos)+(-1e6, 1e6), length.out=n.cores+1)
+    pos <- range(pos)+c(-1e6, 1e6)
+    breaks <- seq(pos[1], pos[2], length.out=n.cores+1)
     poss <- list()
     for(i in 1:n.cores){
-        poss[[i]] <- breaks[c(i:(i+1))]
+        ## poss[[i]] <- breaks[c(i:(i+1))]
+        poss[[i]] <- c(breaks[i],breaks[i]+10000)
+
     }
-    haps <- mclapply(poss, find.haplotypes.from.f2.vector, f1.file=f1.file, f2.file=f2.file, pos.file=pos.file, by.sample.gt.root=by.sample.gt.root, sim.pop.map=sim.pop.map, population="ALL", map.file=map.file, verbose=FALSE)
+    haps <- mclapply(poss, find.haplotypes.from.f2.vector, mc.cores=n.cores, f1.file=f1.file, f2.file=f2.file, pos.file=pos.file, by.sample.gt.root=by.sample.gt.root, pop.map=sim.pop.map,  map.file=map.file, verbose=FALSE)
     haps <- do.call(rbind, haps)
 }
 

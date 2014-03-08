@@ -11,11 +11,11 @@
 ## chr: chromosome
 ########################################################################################################
 
-find.haplotypes.from.f2.vector <- function( pos.lim, f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, verbose=FALSE  ){
-    return( find.haplotypes.from.f2( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=population, map.file, chr=chr, pos.lim=pos.lim, verbose=verbose )
+find.haplotypes.from.f2.vector <- function( pos.lim, f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, map.file, chr=0, verbose=FALSE  ){
+    return( find.haplotypes.from.f2( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, map.file, chr=chr, pos.lim=pos.lim, verbose=verbose ))
 }
 
-find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, pos.lim=c(0, Inf), verbose=FALSE  ){
+find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map,map.file, chr=0, pos.lim=c(0, Inf), verbose=FALSE  ){
   f2 <- load.fn(f2.file)
   f1 <- load.fn(f1.file)
   pos <- scan(pos.file, quiet=TRUE)
@@ -23,15 +23,8 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
 
   mapfn <- get.mapfn(map.file)
 
-  ## restrict to population and position
-  f2 <- f2[pop.map[f2$ID1]==population|pop.map[f2$ID2]==population,]
-  f2 <- f2[f2$pos>=pos.lim[1] & f2$pos<pos.lim[2],]
-  f2 <- f2[order(f2$ID1,f2$ID2),]
-
   ## Set up other columns
   f2$chr <- chr
-  f2$ID.from <- ifelse(pop.map[f2$ID1]==population, f2$ID1, f2$ID2)
-  f2$ID.to <- ifelse(pop.map[f2$ID1]==population, f2$ID2, f2$ID1)
   f2$hap.len <- 0
   f2$hap.left <- 0
   f2$hap.right <- 0
@@ -39,7 +32,12 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
   f2$f2 <- 0
   f2$map.len <- 0
 
+  ## restrict to population and position
+  f2 <- f2[f2$pos>=pos.lim[1] & f2$pos<pos.lim[2],]
+  f2 <- f2[order(f2$ID1,f2$ID2),]
+  
   number.f2 <- NROW(f2)
+  if(number.f2==0){return(f2)}
   
   last.ibd.pos=c(-1,-1)
   last.ID.to=-1
