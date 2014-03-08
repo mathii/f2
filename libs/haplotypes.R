@@ -73,7 +73,7 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     singletons <- NROW(f1[(f1$ID1==this.ID.from|f1$ID1==this.ID.to) & f1$pos>ibd.pos[1] & f1$pos<ibd.pos[2],])
     which.doubletons <- f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>=ibd.pos[1] & f2$pos<=ibd.pos[2],]
     doubletons <- NROW(which.doubletons)
-    if(max( which.doubletons$pos ) > pos.lim[1]){
+    if(max( which.doubletons$pos ) > pos.lim[2]){
         doubletons <- -1
     }
     
