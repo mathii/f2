@@ -11,16 +11,24 @@
 ## chr: chromosome
 ########################################################################################################
 
-find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, verbose=FALSE  ){
+find.haplotypes.from.f2.vector <- function( pos.lim, f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, verbose=FALSE  ){
+    return( find.haplotypes.from.f2( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=population, map.file, chr=chr, pos.lim=pos.lim, verbose=verbose )
+}
+
+find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.root, pop.map, population=NA, map.file, chr=0, pos.lim=c(0, Inf), verbose=FALSE  ){
   f2 <- load.fn(f2.file)
   f1 <- load.fn(f1.file)
   pos <- scan(pos.file, quiet=TRUE)
   haplen <- length(pos)
 
   mapfn <- get.mapfn(map.file)
-    
+
+  ## restrict to population and position
   f2 <- f2[pop.map[f2$ID1]==population|pop.map[f2$ID2]==population,]
+  f2 <- f2[f2$pos>=pos.lim[1] & f2$pos<pos.lim[2],]
   f2 <- f2[order(f2$ID1,f2$ID2),]
+
+  ## Set up other columns
   f2$chr <- chr
   f2$ID.from <- ifelse(pop.map[f2$ID1]==population, f2$ID1, f2$ID2)
   f2$ID.to <- ifelse(pop.map[f2$ID1]==population, f2$ID2, f2$ID1)
@@ -65,7 +73,11 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     ## Note here for doubletons, we really mean >/< rather than >=/<=. However since the breakpoints are inconsistent homozygotes
     ## they can't be consistent doubletons so it doesn't matter and >/< handles the case where the f2 is at the end of the chrom. 
     singletons <- NROW(f1[(f1$ID1==this.ID.from|f1$ID1==this.ID.to) & f1$pos>ibd.pos[1] & f1$pos<ibd.pos[2],])
-    doubletons <- NROW(f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>=ibd.pos[1] & f2$pos<=ibd.pos[2],])
+    which.doubletons <- f2[((f2$ID1==this.ID.from&f2$ID2==this.ID.to)|(f2$ID2==this.ID.from&f2$ID1==this.ID.to)) & f2$pos>=ibd.pos[1] & f2$pos<=ibd.pos[2],]
+    doubletons <- NROW(which.doubletons)
+    if(max( which.doubletons$pos ) > pos.lim[1]){
+        doubletons <- -1
+    }
     
     f2$hap.len[i] <- hap.len
     f2$hap.left[i] <- ibd.pos[1]
@@ -79,8 +91,9 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
     last.ibd.pos <- ibd.pos
   }
 
-  ## Exclude samples which either hit the ends of the chromosome, or which have 0 length 
-  exclude <- (f2$hap.len==0) | (f2$hap.right==max(pos)) | (f2$hap.left==min(pos))
+  ## Exclude samples which either hit the ends of the chromosome, or which have 0 length
+  ## or which have doubletons to the left of the max position. 
+  exclude <- (f2$hap.len==0) | (f2$hap.right==max(pos)) | (f2$hap.left==min(pos)) | (f2$f2==-1)
   
   return(f2[!exclude,])
 }
