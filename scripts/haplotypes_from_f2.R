@@ -37,7 +37,7 @@ if(n.cores==1){
     breaks <- seq(pos[1], pos[2], length.out=n.cores+1)
     poss <- list()
     for(i in 1:n.cores){
-        poss[[i]] <- breaks[c(i,(i+1))]
+        poss[[i]] <- breaks[c(i,i+1)]
     }
     haps <- mclapply(poss, find.haplotypes.from.f2.vector, mc.cores=n.cores, f1.file=f1.file, f2.file=f2.file, pos.file=pos.file, by.sample.gt.root=by.sample.gt.root, pop.map=sim.pop.map,  map.file=map.file, verbose=FALSE)
     haps <- do.call(rbind, haps)
