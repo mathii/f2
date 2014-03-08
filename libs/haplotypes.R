@@ -46,8 +46,8 @@ find.haplotypes.from.f2 <- function( f1.file, f2.file, pos.file, by.sample.gt.ro
   for(i in 1:number.f2){
     if(verbose){cat(paste("\rChr", chr, " (", i, "/", number.f2,") ", sep=""))}
     this.pos <- f2$pos[i]
-    this.ID.to <- f2$ID.to[i]
-    this.ID.from <- f2$ID.from[i]
+    this.ID.to <- f2$ID1[i]
+    this.ID.from <- f2$ID2[i]
 
     #skip if f2 in single indiviudal.
     if(this.ID.from==this.ID.to){next}
