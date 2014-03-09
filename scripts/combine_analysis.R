@@ -42,6 +42,8 @@ for(chr in chrs){
 
   subenv$haps$chr <- chr
   haps[[i]] <- subenv$haps
+  ## Legacy - some of my old datests have extra columns.
+  haps[[i]] <- haps[[i]][,!(names(haps[[i]]) %in% c("ID.from", "ID.to" ))]
   i=i+1
 }
 
