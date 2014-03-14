@@ -25,7 +25,7 @@ fi
 # where is macs?
 MACS_DIR=~/Packages/macs
 # Where do you want the simulations to go?
-SIMS_DIR=/data1/users/mathii/f2_sims/${sim_type}/chr${CHR}
+SIMS_DIR=/data/mathii/f2/simulations/${sim_type}/chr${CHR}
 # Where is the recombination map, in impute format?
 HM2_MAP=~/recombination_maps/hm2/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
@@ -46,7 +46,7 @@ WD=${SIMS_DIR}/raw_macs_data
 TH=${SIMS_DIR}/haplotypes
 RD=${SIMS_DIR}/results
 MD=${SIMS_DIR}/map
-CD=${CODE_DIR}
+echo CD=${CODE_DIR}
 
 for dir in ${WD} ${TH}/by_sample ${RD} ${MD}
 do
@@ -145,6 +145,15 @@ Ne_01)
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
         ;;
+split_10)
+	# time = 
+	nhp=`echo "$nhp1+$nhp2" | bc`
+	echo "$nhp1\n$nhp2" > $RD/groups.txt
+        ${MACS_DIR}/macs ${nhp} ${nbp} -I 2 ${nhp1} ${nhp2} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -ej 0.0001785714 2 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
 ancient_split)
 	nhp=`echo "$nhp1+$nhp2" | bc`
 	echo "$nhp1\n$nhp2" > $RD/groups.txt
