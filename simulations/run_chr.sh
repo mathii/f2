@@ -46,7 +46,7 @@ WD=${SIMS_DIR}/raw_macs_data
 TH=${SIMS_DIR}/haplotypes
 RD=${SIMS_DIR}/results
 MD=${SIMS_DIR}/map
-echo CD=${CODE_DIR}
+CD=${CODE_DIR}
 
 for dir in ${WD} ${TH}/by_sample ${RD} ${MD}
 do
