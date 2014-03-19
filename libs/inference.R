@@ -251,22 +251,22 @@ norm.2.p <- function(x){return(dnorm(x, mean=2))}
 ########################################################################################################
 
 confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, max.search=10){
-  opt <- optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
+    opt <- optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
 
-  mle <- opt$maximum
-  max.ll <- opt$objective
+    mle <- opt$maximum
+    max.ll <- opt$objective
   
-  mle.diff <- qchisq(alpha, df=1, lower.tail=TRUE)/2
+    mle.diff <- qchisq(alpha, df=1, lower.tail=TRUE)/2
 
-  ll.diff <- function(t){
-    ll <- loglikelihood.age(t, Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
-    return((max.ll-ll-mle.diff)^2)
-  }
+    ll.diff <- function(t){
+        ll <- loglikelihood.age(t, Lg=Lg,  Ne=Ne, pf=pf, D=D, error.params=error.params, S.params=S.params)
+        return(max.ll-ll-mle.diff)
+    }
   
-  lower <- optimize( ll.diff, interval=c(0,mle) )$minimum
-  upper <- optimize( ll.diff, interval=c(mle,max.search) )$minimum
+    lower <- uniroot( ll.diff, interval=c(0,mle) )$root
+    upper <- uniroot( ll.diff, interval=c(mle,max.search) )$root
   
-  return(2*Ne*c(lower, upper))
+    return(2*Ne*c(lower, upper))
 }
 
 ########################################################################################################
@@ -288,3 +288,4 @@ MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, 
   if(verbose){cat("\rDone\n")}
   return(t.hat)
 }
+
