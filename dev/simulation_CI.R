@@ -33,7 +33,7 @@ i=1
 for(chr in chrs){
   cat(paste("\r", chr))
 
-  load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
+  load(paste(chr.res.dir, "/chr", chr, "/results/ll_and_density_environment.Rdata", sep=""), envir=subenv)
   t.hats[[i]] <- subenv$t.hats
 
   n.haps <- NROW(subenv$matched)
