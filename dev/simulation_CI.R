@@ -24,6 +24,7 @@ chrs <- 1:22
 ######################################################################################################
 
 t.hats <- list()
+t.true <- list()
 cis <- list()
 subenv <- new.env()
 
@@ -44,21 +45,23 @@ for(chr in chrs){
       this.ci[j,] <- confidence.interval( Lg=subenv$matched$map.len[j],  Ne=subenv$Ne, pf=subenv$p.fun, D=subenv$matched$f2[j], error.params=subenv$error.params, S.params=subenv$S.params[j,], alpha=0.95, max.search=10)
   }
   cis[[i]] <- this.ci
+  t.true[[i]] <- subenv$matched$Age
   i=i+1
 }
 
 t.hats <- do.call("c", t.hats)
+t.true <- do.call("c", t.true)
 cis <- do.call("rbind", cis)
 
 save.image(paste0(res.dir, "/all_ci.Rdata"))
 
-plot( subenv$matched$Age , cis[,2], pch=".", log="xy", col="red", xlim=c(1,50000), ylim=c(1,50000))
-abline(0,1,lty=2)
-points( subenv$matched$Age, cis[,1], pch=".",  col="blue")
-points( subenv$matched$Age, t.hats, pch=".",  col="grey")
-ql <- qqplot( subenv$matched$Age, cis[,1], plot.it=FALSE)
-lines(ql, col="blue")
-qu <- qqplot( subenv$matched$Age, cis[,2], plot.it=FALSE)
-lines(qu, col="red")
-qt <- qqplot( subenv$matched$Age, t.hats, plot.it=FALSE)
-lines(qt, col="grey")
+## plot( t.true , cis[,2], pch=".", log="xy", col="red", xlim=c(1,50000), ylim=c(1,50000))
+## abline(0,1,lty=2)
+## points( t.true, cis[,1], pch=".",  col="blue")
+## points( t.true, t.hats, pch=".",  col="grey")
+## ql <- qqplot(t.true, cis[,1], plot.it=FALSE)
+## lines(ql, col="blue")
+## qu <- qqplot( t.true, cis[,2], plot.it=FALSE)
+## lines(qu, col="red")
+## qt <- qqplot( t.true, t.hats, plot.it=FALSE)
+## lines(qt, col="grey")
