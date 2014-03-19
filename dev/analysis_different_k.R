@@ -49,7 +49,7 @@ for(chr in chrs){
 cat("\n")
 rm(subenv)
 t.hats.k1 <- do.call("c", t.hats.k1)
-t.hats.k2 <- do.call("c", t.hats.k1)
+t.hats.k2 <- do.call("c", t.hats.k2)
 haps <- do.call("rbind", haps)
 
 ## the following is cnp'd from run_1kg_analysis_chr.R.
