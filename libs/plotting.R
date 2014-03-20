@@ -184,7 +184,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
   }
   names(within.list) <- populations
   if(plots){pdf(paste(res.dir, "/", prefix, "within.pdf", sep=""))}else{dev.new()}
-  plot.densities(within.list, grid, cols=pop.cols[populations], main="within", legend.order=legend.order, xlim=xlim, ylim=ylim, ...)
+  plot.densities(within.list, grid, cols=pop.cols[populations], main="Within", legend.order=legend.order, xlim=xlim, ylim=ylim, ...)
   if(plots){dev.off()}
   
   for(i in 1:npop){

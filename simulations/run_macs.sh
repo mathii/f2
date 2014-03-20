@@ -1,5 +1,5 @@
 # Generate macs data, of with specified parameters. 
-run_sim_type=$3
+# Need to call with source so you get the variables. 
 
 case $run_sim_type in
     simple)

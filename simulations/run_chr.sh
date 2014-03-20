@@ -87,7 +87,7 @@ if [ -n "${wrong_map}" ]; then
 fi
 
 # 2) Simulate using macs 
-${CD}/simulations/run_macs.sh ${run_sim_type}
+source ${CD}/simulations/run_macs.sh
 
 # 3)Parse the macs output to get trees and genotypes
 gzip -f ${WD}/trees.txt
