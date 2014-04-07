@@ -223,17 +223,31 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
 ## res.dir: directory to ouput results
 ############################################################################################################################
 
-haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.order=(1:length(populations)), prefix=""){
+haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.order=(1:length(populations)), pop.counts=NA, prefix=""){
    npop <- length(populations)
    counts <- matrix(0, npop, npop)
+   pairs <- matrix(0, npop, npop)
+
    for(i in 1:npop){
      for(j in i:npop){
        counts[i,j] <- counts[j,i] <- sum((pop.1==populations[i]&pop.2==populations[j])|(pop.1==populations[j]&pop.2==populations[i]))
-     }
    }
+ }
    colnames(counts) <- rownames(counts) <- populations
    write.table(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
    res.to.latextab(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.latextab.txt", sep=""))
+
+   if(!all(is.na(pop.counts))){
+       for(i in 1:npop){
+           for(j in i:npop){
+               pairs[i,j] <- pairs[j,i] <- ifelse(i==j, pop.counts[i]*(pop.counts[i]-1)/2, pop.counts[i]*pop.counts[j])
+           }
+       }
+       counts.per <- counts/pairs
+       write.table(counts.per[legend.order,legend.order], paste(res.dir, "/", prefix, "counts_per.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+       res.to.latextab(counts.per[legend.order,legend.order], paste(res.dir, "/", prefix, "counts_per.latextab.txt", sep=""), dp=2)
+
+   }
 }
 
 ############################################################################################################################
@@ -243,9 +257,9 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
 ## output: print here
 ############################################################################################################################
 
-res.to.latextab <- function( res, output, legend.order=(1:NROW(res))){
+res.to.latextab <- function( res, output, dp=0, legend.order=(1:NROW(res))){
   populations <- colnames(res)
-  res <- format(round(res[legend.order,legend.order]), scientific=FALSE,  big.mark=",")
+  res <- format(round(res[legend.order,legend.order], digits=dp), scientific=FALSE,  big.mark=",")
   diag(res) <- paste0("{\\bf{", diag(res), "}}")
   latex.tab <- matrix(apply(cbind(populations, res), 1, paste, collapse=" & "))
   latex.tab <- apply(latex.tab, 1, paste0, "\\\\")
