@@ -1,7 +1,7 @@
 ## compare msmsc gene flow estimates to the between population
 ## f2 density estimates for CEU and CHB populations.
 
-sim.type="CHB_MXLNAT" 
+sim.type="CHB_MXLNAI" 
 
 msmc <- read.table("~/f2_age/1000g/CHB_MXLNAT_4combined_0,1,4,5_msmc.final.txt", header=T, as.is=T)
 msmc$flow <- 2*msmc$lambda_01/(msmc$lambda_00+msmc$lambda_11)
@@ -29,14 +29,39 @@ t.hats <- list()
 ## load saved results
 cat("Loading data\n")
 i=1
-for(chr in chrs){
-  cat(paste("\r", chr))
-  load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
+if(FALSE){                               #Load from chr
+  for(chr in chrs){
+    cat(paste("\r", chr))
+    load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
   
+    haps <- subenv$haps
+    haps$chr <- chr                         #duh
+    
+    ID1.pop <- pop.map[haps$ID1]
+    ID2.pop <- pop.map[haps$ID2]
+    include <- (ID1.pop=="CHB"&ID2.pop=="MXL")|(ID2.pop=="CHB"&ID1.pop=="MXL")
+  
+    which.MXL <- ifelse(ID1.pop=="MXL", haps$ID1, haps$ID2)
+    for(i in 1:NROW(haps)){
+      if(!include[i]){next}
+      cat(paste0("\r", i))
+      this.MXL <- names(pop.map)[which.MXL[i]]
+      my.tracts <- hom.tracts[[this.MXL]]
+      
+      n.tracts <- sum((haps$chr[i]==my.tracts[,1]) & (haps$hap.left[i]>my.tracts[,2]) & (haps$hap.right[i]<my.tracts[,3]))
+      
+      if(!n.tracts){include[i] <- FALSE}
+    }
 
-  haps <- subenv$haps
-  haps$chr <- chr                         #duh
-
+    t.hats[[i]]<-MLE.from.haps(haps[include,], subenv$Ne, S.params=subenv$S.params[include,], error.params=subenv$error.params, verbose=TRUE)
+    
+    i=i+1
+  }
+  cat("\n")
+  
+  t.hats <- do.call("c", t.hats)
+}else{                               #Load from new code
+  load(paste(chr.res.dir, "/all/all_results.Rdata", sep=""))
   ID1.pop <- pop.map[haps$ID1]
   ID2.pop <- pop.map[haps$ID2]
   include <- (ID1.pop=="CHB"&ID2.pop=="MXL")|(ID2.pop=="CHB"&ID1.pop=="MXL")
@@ -47,19 +72,15 @@ for(chr in chrs){
     cat(paste0("\r", i))
     this.MXL <- names(pop.map)[which.MXL[i]]
     my.tracts <- hom.tracts[[this.MXL]]
-    
+       
     n.tracts <- sum((haps$chr[i]==my.tracts[,1]) & (haps$hap.left[i]>my.tracts[,2]) & (haps$hap.right[i]<my.tracts[,3]))
-
+      
     if(!n.tracts){include[i] <- FALSE}
   }
-
-  t.hats[[i]]<-MLE.from.haps(haps[include,], subenv$Ne, S.params=subenv$S.params[include,], error.params=subenv$error.params, verbose=TRUE)
-
-  i=i+1
+  t.hats <- t.hats[include]
+  haps <- haps[include,]
 }
-cat("\n")
-  
-t.hats <- do.call("c", t.hats)
+
 t.hat.dens <- density(log10(t.hats))
 par(mar=c(5.1,4.1,2.1,4.1))
 
