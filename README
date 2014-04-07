@@ -1,6 +1,6 @@
 These directories contain various scripts for estimating the age of 
 f2 variants, as described in "Demography and the age of rare variants"
-- Mathieson & McVean, in preparation. This is not finished software by 
+- Mathieson & McVean, (http://arxiv.org/abs/1401.4181). This is not finished software by 
 any means, but we provide the scripts for people to explore the results
 in the paper, or investigate their own datasets. 
 
