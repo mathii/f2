@@ -39,7 +39,7 @@ bottleneck_10)
 schaffner)
 	nhp=400
 	ne=100000
-	python ${CD}/scripts/schaffner.py $nhp $nbp  \
+	python ${CD}/scripts/schaffner.py 100 $nbp  \
 	    ${MD}/map.txt 12345 ${WD} ${MACS_DIR}
 ;;
 complex)

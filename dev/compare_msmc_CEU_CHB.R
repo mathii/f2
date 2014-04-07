@@ -26,25 +26,34 @@ if(TRUE ){
   ## load saved results
   cat("Loading data\n")
   i=1
-  for(chr in chrs){
-    cat(paste("\r", chr))
-    load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
+  if(TRUE){                            #To load from chr
+    for(chr in chrs){
+      cat(paste("\r", chr))
+      load(paste(chr.res.dir, "/chr", chr, "/results/ll_environment.Rdata", sep=""), envir=subenv)
 
-    haps <- subenv$haps
+      haps <- subenv$haps
 
-    ID1.pop <- pop.map[haps$ID1]
-    ID2.pop <- pop.map[haps$ID2]
-    include <- (ID1.pop=="CEU"&ID2.pop=="CHB")|(ID2.pop=="CEU"&ID1.pop=="CHB")
+      ID1.pop <- pop.map[haps$ID1]
+      ID2.pop <- pop.map[haps$ID2]
+      include <- (ID1.pop=="CEU"&ID2.pop=="CHB")|(ID2.pop=="CEU"&ID1.pop=="CHB")
+      
+      t.hats[[i]]<-MLE.from.haps(haps[include,], subenv$Ne, S.params=subenv$S.params[include,], error.params=subenv$error.params, verbose=TRUE)
     
-    t.hats[[i]]<-MLE.from.haps(haps[include,], subenv$Ne, S.params=subenv$S.params[include,], error.params=subenv$error.params, verbose=TRUE)
+      i=i+1
+    }
+    cat("\n")
     
-  i=i+1
+    t.hats <- do.call("c", t.hats)
+    t.hat.dens <- density(log10(t.hats))
+  } else{                               #Load from new code
+     load(paste(chr.res.dir, "/all/all_results.Rdata", sep=""))
+     ID1.pop <- pop.map[haps$ID1]
+     ID2.pop <- pop.map[haps$ID2]
+     include <- (ID1.pop=="CEU"&ID2.pop=="CHB")|(ID2.pop=="CEU"&ID1.pop=="CHB")
+     t.hats <- t.hats[include]
+     haps <- haps[include,]
+     t.hat.dens <- density(log10(t.hats))
   }
-  cat("\n")
-  
-  t.hats <- do.call("c", t.hats)
-  t.hat.dens <- density(log10(t.hats))
-
 }
 
 par(mar=c(5.1,4.1,2.1,4.1))
