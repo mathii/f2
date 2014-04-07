@@ -60,10 +60,12 @@ densities <- rep(list(list()),npop)
 
 ID1.pop <- pop.map[haps$ID1]
 ID2.pop <- pop.map[haps$ID2]
+bw <- c()
 for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
-    dens <- density(log10(t.hats[include]))
+    dens <- density(log10(t.hats[include]), bw=0.04)
+    bw <- c(bw, dens$bw)
     densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
   }
 }
@@ -75,6 +77,6 @@ save.image(paste0(res.dir, "/all_results.RData"))
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order )
-haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, legend.order=legend.order)
+haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, pop.counts=table(pop.map)[populations], legend.order=legend.order)
 
 
