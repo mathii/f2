@@ -35,3 +35,24 @@ for(i in 1:(npop)){
 legend.order=names(pop.cols)
 ## plots. One plot of all within-group densities, and one of all densities in total.
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order )
+
+## ##Make PC plot
+## library(SNPRelate)
+## data<-matrix(0, nrow=200, ncol=1038684)
+## for(i in 1:200){
+## cat(paste0("\r", i))
+## data[i,]<-scan(paste0("SIM", i, ".gt.gz") , quiet=T)
+## }
+## pos <- scan("pos.gz", quiet=T)
+
+## snpgdsCreateGeno("test.gds", genmat=data, sample.id=1:200, snp.id=1:NCOL(data), snp.position=pos, snpfirstdim=F)
+## genofile <- openfn.gds("test.gds")
+## snpset <- snpgdsLDpruning(genofile, ld.threshold=0.2)
+## pca <- snpgdsPCA(genofile, snp.id=snpset$chr1)
+## par(mfrow=c(2,2))
+## par(mar=c(4,4,2,2))
+
+## for(i in 1:4){
+## plot(pca$eigenvect[,i], pca$eigenvect[,i+1], xlab=paste0("PC", i), yla=paste0("PC", i+1), col=pop.cols[pop.map], pch=1)
+## legend("topleft", names(pop.cols), col=pop.cols, pch=1, bty="n")
+## }

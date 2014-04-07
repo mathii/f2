@@ -174,7 +174,7 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 ## res.dir: directory to output results. if NULL then open windows. 
 ############################################################################################################################
 
-density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), prefix="", ...){
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, add.plot=FALSE, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), prefix="", ...){
   plots <- !is.null(res.dir)
   npop <- length(populations)
   
@@ -183,7 +183,8 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
     within.list[[i]] <- densities[[i]][[i]]
   }
   names(within.list) <- populations
-  if(plots){pdf(paste(res.dir, "/", prefix, "within.pdf", sep=""))}else{dev.new()}
+  if(plots){pdf(paste(res.dir, "/", prefix, "within.pdf", sep=""))
+          } else if(!add.plot){dev.new()}
   plot.densities(within.list, grid, cols=pop.cols[populations], main="Within", legend.order=legend.order, xlim=xlim, ylim=ylim, ...)
   if(plots){dev.off()}
   
@@ -194,7 +195,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
   }
     names(between.list) <- populations
 
-    if(plots){pdf(paste(res.dir, "/", prefix , "between_", populations[i], ".pdf", sep=""))}else{dev.new()}
+    if(plots){pdf(paste(res.dir, "/", prefix , "between_", populations[i], ".pdf", sep=""))}else if(!add.plot){dev.new()}
     plot.densities(between.list, grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order,  xlim=xlim, ylim=ylim, ...)
     if(plots){dev.off()}
   }
