@@ -41,7 +41,7 @@ haps <- haps[haps$map.len>0,]
 ## from the coalescent_fns.R file - need to compute for higher n
 qns <- list(function(t){1}, q2, q3, q4, q5)
 ## estimate ages
-t.hats <- MLE.from.haps(haps, Ne, S.params=NA,  error.params=error.params, verbose=TRUE, p.fun=qns[[n]])
+t.hats <- MLE.from.haps(haps, Ne, S.params=NA,  error.params=error.params, verbose=TRUE, p.fun=qns[[n]], max.search=100)
 
 haps <- cbind(haps, t.hat=t.hats)
 
