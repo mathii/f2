@@ -24,9 +24,14 @@ ss_test)
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 ;;
 bottleneck)
-	echo "bottleneck 15" > $RD/events.txt
         ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -eN 0.00025 0.01 -eN 0.0003 1 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
+bottleneck_long)
+        ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -eN 0.0008928571 0.05 -eN 0.001785714 1 -T 2> \
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;

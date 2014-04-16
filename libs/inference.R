@@ -44,6 +44,16 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
 }
 
 ########################################################################################################
+## Trivially just the exponential of the loglikelihood. Not normalised. 
+########################################################################################################
+
+likelihood.age <- function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5){
+    return(exp(loglikelihood.age(t, Lg, Ne, D, pf, error.params=error.params, S.params=S.params, shape=shape)))
+}
+
+likelihood.age.vector <- Vectorize(likelihood.age, vectorize.args="t")
+
+########################################################################################################
 ## Compute the approximate probability that a recombination when the tmrca is tau
 ## changes the number of lineages when there are n lineages
 ########################################################################################################
