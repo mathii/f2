@@ -35,6 +35,12 @@ bottleneck_long)
             ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
             | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
 	;;
+double)
+        ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
+            -h 1e3 -R ${MD}/map.txt -eN 0.0008928571 2 -T 2> \
+            ${SIMS_DIR}/raw_macs_data/trees.txt | ${MACS_DIR}/msformatter \
+            | gzip -cf > ${SIMS_DIR}/raw_macs_data/haplotypes.txt.gz
+	;;
 bottleneck_10)
         ${MACS_DIR}/macs ${nhp} ${nbp} -t ${theta} -r ${rho} \
             -h 1e3 -R ${MD}/map.txt -eN 0.0001785714 0.05 -eN 0.0002678571 1 -T 2> \
