@@ -9,7 +9,7 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==8){
+if(length(args)==8|length(args)==9){
   code.dir <- args[1]
   res.dir <- args[2]
   Ne <- as.numeric(args[3])
