@@ -18,6 +18,10 @@ if(length(args)==8){
   max.log <- as.numeric(args[6])
   bins <- as.numeric(args[7])
   setup.file <- args[8]
+  use.S.params <- 1
+  if(length(args)>8){
+      use.S.params <- as.numeric(args[9])
+  }
   plots <- TRUE
 } else{
   stop("Need to specify 8 arguments")
@@ -40,10 +44,13 @@ if("ibd.len" %in% names(haps)){names(haps)[which(names(haps)=="ibd.len")] <- "ha
 haps <- haps[haps$map.len>0,]
 
 ## Singleton parameters
-S.params <- haps[,c("f1", "hap.len")]
-names(S.params) <- c("S", "Lp")
-S.params$theta <- 4*Ne*mu
-S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+S.params <- NA
+if(use.S.params){
+    S.params <- haps[,c("f1", "hap.len")]
+    names(S.params) <- c("S", "Lp")
+    S.params$theta <- 4*Ne*mu
+    S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+}
 t.hats <- MLE.from.haps(haps, Ne, S.params=S.params,  error.params=error.params, verbose=TRUE)
 
 save.image(paste(res.dir, "/ll_environment.Rdata", sep=""))
