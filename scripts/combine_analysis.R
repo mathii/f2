@@ -4,14 +4,18 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==4){
+min.f2<-1 # Minimum number of f2 in haplotype
+if(length(args)==4||length(args)==5){
   chr.res.dir <- args[1]
   res.dir <- args[2]
   code.dir <- args[3]
   setup.file <- args[4]
   plots <- TRUE
+  if(length(args)==5){
+    min.f2<-as.numeric(args[5])
+  }
 } else{
-  stop("Need to specify 4 arguments")
+  stop("Need to specify 4 or 5 arguments")
 }
 
 ######################################################################################################
@@ -52,6 +56,12 @@ rm(subenv)
 t.hats <- do.call("c", t.hats)
 haps <- do.call("rbind", haps)
 
+#Cut out everything with less than min.f2 variants
+b4<-NROW(haps)
+haps <- haps[haps$f2>=min.f2,]
+a4<-NROW(haps)
+cat(paste0("Removed ",  b4-a4, "haplotypes with too few f2 variants\n"))
+
 ## the following is cnp'd from run_1kg_analysis_chr.R.
 ## estimate densities, by population.
 populations <- sort(unique(pop.map))
@@ -64,9 +74,12 @@ bw <- c()
 for(i in 1:(npop)){
   for(j in i:npop){
     include <- (ID1.pop==populations[i]&ID2.pop==populations[j])|(ID1.pop==populations[j]&ID2.pop==populations[i])
-    dens <- density(log10(t.hats[include]), bw=0.04)
-    bw <- c(bw, dens$bw)
-    densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
+    if(sum(include)>1){
+      dens <- density(log10(t.hats[include]))
+      densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
+    }else{
+      densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0*x)}
+    }
   }
 }
 
