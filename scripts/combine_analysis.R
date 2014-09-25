@@ -78,10 +78,10 @@ for(i in 1:(npop)){
         if(sum(include)>1){
             dens <- density(log10(t.hats[include]))
             densities[[i]][[j]] <- densities[[j]][[i]] <- approxfun(dens, rule=2)
-            q50.direct[i,j] <- q50.direct[j,i] <- median(log10(t.hats[include]))
+            q50.direct[i,j] <- q50.direct[j,i] <- median(t.hats[include])
         }else{
             densities[[i]][[j]] <- densities[[j]][[i]] <- function(x){return(0*x)}
-            q50.direct[i,j] <- q50.direct[j,i] <- 0
+            q50.direct[i,j] <- q50.direct[j,i] <- 999999
         }
     }
 }
@@ -95,8 +95,8 @@ save.image(paste0(res.dir, "/all_results.RData"))
 density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, pop.counts=table(pop.map)[populations], legend.order=legend.order)
 
-rownames(q50.direct) <- colnames(q50.direct) <- populationsxs
-write.table(q50.direct[legend.order,legend.order], paste(res.dir, "/q50_direct.txt"), row.names=TRUE, col.names=TRUE, sep="\t")
+rownames(q50.direct) <- colnames(q50.direct) <- populations
+write.table(q50.direct[legend.order,legend.order], paste0(res.dir, "/q50_direct.txt"), row.names=TRUE, col.names=TRUE, sep="\t")
 
 
 
