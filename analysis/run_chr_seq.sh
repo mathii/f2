@@ -15,18 +15,18 @@ nbp=$3
 # Edit parameters here. 
 
 # Where do you want the simulations to go?
-VCFTOOLS=~/Packages/vcftools_0.1.11/bin/vcftools
-SIMS_DIR=/data1/users/mathii/1000gP3/results_seq_no_indels_no_LCR/chr${CHR}
+VCFTOOLS=~/Packages/vcftools_0.1.12a/bin/vcftools
+SIMS_DIR=/groups/reich/iain/f2/1000gP3/chr${CHR}
 # Where are the recombination maps, in impute format
-HM2_MAP=~/hm2_recombination_map/genetic_map_GRCh37_chr${CHR}.txt.gz
+HM2_MAP=~/recombination_maps/hm2/genetic_map_GRCh37_chr${CHR}.txt.gz
 # Where is the code - this point to the directory you downloaded from github
-CODE_DIR=~/f2/f2_age
+CODE_DIR=~/f2_age/code
 # two colum tab delim file - col1=sample name, col2=population
 PANEL=${CODE_DIR}/analysis/1kgP3_panel.txt
 # Setup file - see the 1kg file for an example
 SETUP_FILE=${CODE_DIR}/analysis/1kgP3_setup.R
 # Low complexity regions file
-lcr_file=/data1/users/mathii/1000g/data/LCR/hs37d5-LCRs.20140224.bed
+lcr_file=/groups/reich/iain/f2/files/hs37d5-LCRs.20140224.bed
 
 # Parameters: number of hapotypes, Ne, estimated doubleton power, mutation rate 
 ne=185000
@@ -44,7 +44,7 @@ do
 done
 
 LOG=${RD}/log.txt
-#exec > ${LOG} 2>&1                                                                                                                                        
+exec > ${LOG} 2>&1                                                                                                                                        
 
 # 1) Parse data into correct format 
 # 1.1) Extract sample names
@@ -52,7 +52,7 @@ cut -f1 ${PANEL} > ${TH}/samples.txt
 
 # 1.2) Chip data
 # set max number of file descriptors
-ulimit -n 1200
+ulimit -n 3000
 # Keep only the samples we want - can skip this step if you know that you
 # are keeping all the samples and sites in the chip data. 
 ${VCFTOOLS} --gzvcf ${path_to_chip_data} --keep ${TH}/samples.txt \
@@ -86,7 +86,7 @@ done
 
 # 2) Find f2 haplotypes
 R --vanilla --quiet --slave --args ${CD} ${TH} ${RD}/f2_haplotypes.txt \
-    ${HM2_MAP} 0 < ${CD}/scripts/haplotypes_from_f2.R
+    ${HM2_MAP} 0 8 < ${CD}/scripts/haplotypes_from_f2.R
 gzip -f ${RD}/f2_haplotypes.txt 
 
 # 3) Estimate distributions
