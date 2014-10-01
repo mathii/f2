@@ -86,13 +86,13 @@ for(i in 1:(npop)){
     }
 }
 
-l.o <- c("ASW", "LWK", "YRI", "CLM", "MXL", "PUR",  "CHB", "CHS", "JPT", "CEU", "FIN", "GBR", "IBS", "TSI")
+l.o <- c("ESN", "GWD", "LWK", "MSL", "YRI", "ACB", "ASW", "CLM", "MXL", "PEL", "PUR", "CDX", "CHB", "CHS", "JPT", "KHV", "CEU", "FIN", "GBR", "IBS", "TSI", "BEB", "GIH", "ITU", "PJL", "STU")
 legend.order=order(match(populations, l.o))
 
 save.image(paste0(res.dir, "/all_results.RData"))
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order )
+density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order, legend.cex=0.8 )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, pop.counts=table(pop.map)[populations], legend.order=legend.order)
 
 rownames(q50.direct) <- colnames(q50.direct) <- populations
