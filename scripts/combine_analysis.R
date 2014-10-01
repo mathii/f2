@@ -92,7 +92,7 @@ legend.order=order(match(populations, l.o))
 save.image(paste0(res.dir, "/all_results.RData"))
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order, legend.cex=0.8 )
+density.summary.plots(densities, populations, pop.cols, res.dir, xlim=c(1,5), ylim=c(0,1.2), legend.order=legend.order, legend.cex=0.5 )
 haplotype.count.summary( ID1.pop, ID2.pop, populations, res.dir, pop.counts=table(pop.map)[populations], legend.order=legend.order)
 
 rownames(q50.direct) <- colnames(q50.direct) <- populations
