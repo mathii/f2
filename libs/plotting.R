@@ -260,7 +260,7 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
 
 res.to.latextab <- function( res, output, dp=0, legend.order=(1:NROW(res))){
   populations <- colnames(res)
-  res <- format(round(res[legend.order,legend.order], digits=dp), scientific=FALSE,  big.mark=",")
+  res <- format(round(res[legend.order,legend.order,drop=FALSE], digits=dp), scientific=FALSE,  big.mark=",")
   diag(res) <- paste0("{\\bf{", diag(res), "}}")
   latex.tab <- matrix(apply(cbind(populations, res), 1, paste, collapse=" & "))
   latex.tab <- apply(latex.tab, 1, paste0, "\\\\")
