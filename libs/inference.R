@@ -11,6 +11,7 @@ library(gsl)
 ## pf: Function giving the probability that a recombination changes the tmrca
 ## error.params: (shape, rate) for the gamma overestimate in Lg
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
+## Shape: gamma distribution parameter to use. 
 ########################################################################################################
 
 loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5){
@@ -25,6 +26,49 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
     mu=error.params[2]
     t1 <- r*log(lm)+log(hyperg_1F1(r, r+s, Lg*(mu-lm)))
   }
+  
+  t2 <- 0
+  if(!all(is.na(S.params))){            #If we supplied singleton information, use that. 
+    ## Sum of poisson and negative binomial...
+    S <- S.params$S
+    s.vals <- 0:S
+    nbprob <- 1/(1+S.params$Ep)         #Ep is theta*Lp/2/n, here. 
+    probs <- dpois(s.vals, lambda=S.params$theta*S.params$Lp*t)*dnbinom(S-s.vals, size=2, prob=nbprob)
+    t2 <- log(sum(probs))
+  }
+  ## print(c(t1,t2))
+  ## bit hacky until we figure out how to deal with this underflow...
+  if(t1+t2< -1e8){                       #This should be small enough!
+    return(-1e8-t)
+  }
+  return(t1+t2)
+}
+
+########################################################################################################
+## loglikelihood for age t, conditional on number of singletons and genetic length
+## version 2 - incorporating theoretical probability of seeing an d2
+## t: Age (coalescent units)
+## Lg: Genetic length
+## Ne: Effective pop size
+## D: Number of doubletons
+## pf: Function giving the probability that a recombination changes the tmrca
+## error.params: (shape, rate) for the gamma overestimate in Lg
+## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
+## mu: rate of f2s
+########################################################################################################
+
+loglikelihood.age.v2 <- function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, mu=1){
+  t1 <- 0
+  
+  lm=4*Ne*t*pf(t)
+  if(all(is.na(error.params))){
+    t1 <- log(lm)+log(1+lm/mu)-lm*Lg-log(1-exp(-mu*Lg))
+  } else{
+    s=error.params[1]
+    r=error.params[2]
+    integrand <- function(x){(log(lm)+log(1+lm/mu)-lm*x-log(1-exp(-mu*x)))*dgamma(Lg-x, shape=s, rate=r)}
+    t1 <- log(integrate(integrand, lower=0, upper=Lg)$value)
+}
   
   t2 <- 0
   if(!all(is.na(S.params))){            #If we supplied singleton information, use that. 
