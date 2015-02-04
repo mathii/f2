@@ -62,7 +62,7 @@ loglikelihood.age.v2 <- function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA,
   
   lm=4*Ne*t*pf(t)
   if(all(is.na(error.params))){
-    t1 <- log(lm)+log(1+lm/mu)-lm*Lg-log(1-exp(-mu*Lg))
+    t1 <- log(lm)+log(1+lm/mu)-lm*Lg+log(1-exp(-mu*Lg))
   } else{
     s=error.params[1]
     r=error.params[2]
