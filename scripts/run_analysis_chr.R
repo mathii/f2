@@ -43,6 +43,7 @@ haps <- haps[haps$map.len>0,]
 S.params <- haps[,c("f1", "hap.len")]
 names(S.params) <- c("S", "Lp")
 S.params$theta <- 4*Ne*mu
+## These theta estimates are theta/2n
 S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
 t.hats <- MLE.from.haps(haps, Ne, S.params=S.params,  error.params=error.params, verbose=TRUE)
 

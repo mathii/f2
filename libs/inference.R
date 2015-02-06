@@ -13,7 +13,7 @@ library(gsl)
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
 ########################################################################################################
 
-loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5){
+loglikelihood.age <-function(t, Lg, Ne, D, pf=function(x){1}, error.params=NA, S.params=NA, shape=1.5){
   t1 <- 0
   
   if(all(is.na(error.params))){
