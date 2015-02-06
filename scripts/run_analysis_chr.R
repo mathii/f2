@@ -9,7 +9,7 @@ set.seed(12345)
 
 ######################################################################################################
 
-if(length(args)==8){
+if(length(args)==8|length(args)==9){
   code.dir <- args[1]
   res.dir <- args[2]
   Ne <- as.numeric(args[3])
@@ -18,6 +18,10 @@ if(length(args)==8){
   max.log <- as.numeric(args[6])
   bins <- as.numeric(args[7])
   setup.file <- args[8]
+  use.S.params <- 1
+  if(length(args)>8){
+      use.S.params <- as.numeric(args[9])
+  }
   plots <- TRUE
 } else{
   stop("Need to specify 8 arguments")
@@ -40,11 +44,16 @@ if("ibd.len" %in% names(haps)){names(haps)[which(names(haps)=="ibd.len")] <- "ha
 haps <- haps[haps$map.len>0,]
 
 ## Singleton parameters
-S.params <- haps[,c("f1", "hap.len")]
-names(S.params) <- c("S", "Lp")
-S.params$theta <- 4*Ne*mu
-## These theta estimates are theta/2n
-S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+S.params <- NA
+if(use.S.params){
+    cat("Using S.params\n")
+    S.params <- haps[,c("f1", "hap.len")]
+    names(S.params) <- c("S", "Lp")
+    S.params$theta <- 4*Ne*mu
+    S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+} else{
+    cat("Not using S.params\n")
+}
 t.hats <- MLE.from.haps(haps, Ne, S.params=S.params,  error.params=error.params, verbose=TRUE)
 
 save.image(paste(res.dir, "/ll_environment.Rdata", sep=""))
@@ -69,4 +78,4 @@ for(i in 1:(npop)){
 }
 
 ## plots. One plot of all within-group densities, and one of all densities in total.
-density.summary.plots(densities, populations, pop.cols, res.dir, max.log=max.log, xlim=c(1,5), ylim=c(0,2) )
+density.summary.plots(densities, populations, pop.cols, res.dir, max.log=max.log, xlim=c(1,5), ylim=c(0,1) )

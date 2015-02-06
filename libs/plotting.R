@@ -129,7 +129,7 @@ overlapping.power.plot <- function(elements, cols, main="", xlab="", legend.pos=
 ## lwd, lty: standard graphical parameters
 ############################################################################################################################
 
-plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:length(cols)), xlim=c(0,5), ...){
+plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:length(cols)), xlim=c(0,5), legend.cex=1, ...){
   names <- names(densities)
   n <- length(names)
   plot(10^grid, densities[[1]](grid), col=cols[1], lwd=lwd, lty=lty, bty="n", type="l", xlab=expression(Age~(generations)), ylab="Density", log="x", xlim=10^xlim, xaxt="n", ...)
@@ -143,13 +143,13 @@ plot.densities <- function(densities, grid, cols, lwd=1, lty=1, legend.order=(1:
   ## mtext(bquote(10^.(int+1)), 1, at=10^(int+1), line=1)
   mtext(format(10^(int+1), big.mark=",", scientific=10), 1, at=10^(int+1), line=1)
   axis(1, at=at, label=FALSE)
-  
+
   if(n>1){
     for(i in 2:n){
       lines(10^grid, densities[[i]](grid), col=cols[i], lwd=lwd, lty=lty)
     }
   }
-  legend("topright", populations[legend.order], col=cols[legend.order], lwd=lwd, lty=lty, bty="n")
+  legend("topright", populations[legend.order], col=cols[legend.order], lwd=lwd, lty=lty, bty="n", cex=legend.cex)
 }
 
 ############################################################################################################################
@@ -174,7 +174,7 @@ quantile.density <- function(dens, quantile, lower=0, upper=6){
 ## res.dir: directory to output results. if NULL then open windows. 
 ############################################################################################################################
 
-density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, add.plot=FALSE, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), prefix="", ...){
+density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL, add.plot=FALSE, legend.order=(1:length(populations)), max.log=6, xlim=c(0,5), ylim=c(0,1), grid=seq(xlim[1], xlim[2], length.out=1000), prefix="", legend.cex=1, ...){
   plots <- !is.null(res.dir)
   npop <- length(populations)
   
@@ -196,7 +196,7 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
     names(between.list) <- populations
 
     if(plots){pdf(paste(res.dir, "/", prefix , "between_", populations[i], ".pdf", sep=""))}else if(!add.plot){dev.new()}
-    plot.densities(between.list, grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order,  xlim=xlim, ylim=ylim, ...)
+    plot.densities(between.list, grid, cols=pop.cols[populations], main=populations[i], legend.order=legend.order,  xlim=xlim, ylim=ylim, legend.cex=legend.cex, ...)
     if(plots){dev.off()}
   }
 
@@ -211,8 +211,8 @@ density.summary.plots <- function(densities, populations, pop.cols, res.dir=NULL
       }
       
       colnames(res) <- rownames(res) <- populations
-      write.table(res[legend.order,legend.order], paste(res.dir, "/", prefix, "q", round(q*100), ".txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
-      res.to.latextab(res[legend.order,legend.order], paste(res.dir, "/", prefix, "q", round(q*100), ".latextab.txt", sep=""))
+      write.table(res[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "q", round(q*100), ".txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+      res.to.latextab(res[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "q", round(q*100), ".latextab.txt", sep=""))
     }
   }
 }
@@ -235,8 +235,8 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
    }
  }
    colnames(counts) <- rownames(counts) <- populations
-   write.table(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
-   res.to.latextab(counts[legend.order,legend.order], paste(res.dir, "/", prefix, "counts.latextab.txt", sep=""))
+   write.table(counts[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "counts.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+   res.to.latextab(counts[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "counts.latextab.txt", sep=""))
 
    if(!all(is.na(pop.counts))){
        for(i in 1:npop){
@@ -245,8 +245,8 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
            }
        }
        counts.per <- counts/pairs
-       write.table(counts.per[legend.order,legend.order], paste(res.dir, "/", prefix, "counts_per.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
-       res.to.latextab(counts.per[legend.order,legend.order], paste(res.dir, "/", prefix, "counts_per.latextab.txt", sep=""), dp=2)
+       write.table(counts.per[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "counts_per.txt", sep=""), row.names=TRUE, col.names=TRUE, sep="\t")
+       res.to.latextab(counts.per[legend.order,legend.order,drop=FALSE], paste(res.dir, "/", prefix, "counts_per.latextab.txt", sep=""), dp=2)
 
    }
 }
@@ -260,7 +260,7 @@ haplotype.count.summary <- function( pop.1, pop.2, populations, res.dir, legend.
 
 res.to.latextab <- function( res, output, dp=0, legend.order=(1:NROW(res))){
   populations <- colnames(res)
-  res <- format(round(res[legend.order,legend.order], digits=dp), scientific=FALSE,  big.mark=",")
+  res <- format(round(res[legend.order,legend.order,drop=FALSE], digits=dp), scientific=FALSE,  big.mark=",")
   diag(res) <- paste0("{\\bf{", diag(res), "}}")
   latex.tab <- matrix(apply(cbind(populations, res), 1, paste, collapse=" & "))
   latex.tab <- apply(latex.tab, 1, paste0, "\\\\")

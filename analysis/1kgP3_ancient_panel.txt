@@ -2502,3 +2502,9 @@ NA21141	GIH
 NA21142	GIH
 NA21143	GIH
 NA21144	GIH
+AltaiNea	Neanderthal
+DenisovaPinky	Denisovan
+LBK	LBK
+Loschbour	Loschbour
+Ust_Ishim	Ust_Ishim
+clovis	Clovis
