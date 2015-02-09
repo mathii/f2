@@ -46,10 +46,13 @@ haps <- haps[haps$map.len>0,]
 ## Singleton parameters
 S.params <- NA
 if(use.S.params){
+    cat("Using S.params\n")
     S.params <- haps[,c("f1", "hap.len")]
     names(S.params) <- c("S", "Lp")
     S.params$theta <- 4*Ne*mu
     S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
+} else{
+    cat("Not using S.params\n")
 }
 t.hats <- MLE.from.haps(haps, Ne, S.params=S.params,  error.params=error.params, verbose=TRUE)
 

@@ -16,6 +16,7 @@ library(gsl)
 ########################################################################################################
 
 loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5, mu=NA){
+
   t1 <- 0
   
   if(all(is.na(error.params))){
