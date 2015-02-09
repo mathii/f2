@@ -11,10 +11,11 @@ library(gsl)
 ## pf: Function giving the probability that a recombination changes the tmrca
 ## error.params: (shape, rate) for the gamma overestimate in Lg
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
-## Shape: gamma distribution parameter to use. 
+## Shape: gamma distribution parameter to use.
+## mu: not used
 ########################################################################################################
 
-loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5){
+loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=1.5, mu=NA){
   t1 <- 0
   
   if(all(is.na(error.params))){
@@ -55,21 +56,24 @@ loglikelihood.age <-function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, sha
 ## error.params: (shape, rate) for the gamma overestimate in Lg
 ## S.params - list: S, theta, Lp, Ep: singletons, theta, phyical length, expected singletons
 ## mu: rate of f2s
+## Shape: not used
 ########################################################################################################
 
-loglikelihood.age.v2 <- function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, mu=1){
+loglikelihood.age.v2 <- function(t, Lg, Ne, D, pf, error.params=NA, S.params=NA, shape=NA, mu=1){
   t1 <- 0
+
+  ## print(t)
   
   lm=4*Ne*t*pf(t)
   if(all(is.na(error.params))){
-    t1 <- log(lm)+log(1+lm/mu)-lm*Lg+log(1-exp(-mu*Lg))
+      t1 <- log(lm)+log(1+lm/mu)-lm*Lg+log(1-exp(-mu*Lg))
   } else{
-    s=error.params[1]
-    r=error.params[2]
-    integrand <- function(x){(log(lm)+log(1+lm/mu)-lm*x-log(1-exp(-mu*x)))*dgamma(Lg-x, shape=s, rate=r)}
-    t1 <- log(integrate(integrand, lower=0, upper=Lg)$value)
-}
-  
+      s=error.params[1]
+      r=error.params[2]
+      integrand <- function(x){lm*(1+lm/mu)*exp(-lm*x)*(1-exp(-mu*x))*dgamma(Lg-x, shape=s, rate=r)}
+      t1 <- log(integrate(integrand, lower=0, upper=Lg)$value)
+  }
+
   t2 <- 0
   if(!all(is.na(S.params))){            #If we supplied singleton information, use that. 
     ## Sum of poisson and negative binomial...
@@ -328,17 +332,39 @@ confidence.interval <- function(Lg, Ne, pf, D, error.params, S.params, alpha, ma
 ## S.params
 ########################################################################################################
 
-MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.5, verbose=FALSE, tol=1/2/Ne){
+MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, p.fun=function(x){1}, shape=1.5, verbose=FALSE, tol=1/2/Ne, v2=FALSE, mu=NA, ignoreErrors=FALSE){
 
   nh <- NROW(haps)
   t.hat <- rep(0, nh)
   has.S.params <- !all(is.na(S.params))
+
+  likelihood <- loglikelihood.age
+  if(v2){
+      likelihood <- loglikelihood.age.v2
+  }
+
   sp <- NA
+  error.count <- 0
   for(j in 1:nh){
     if(verbose){cat(paste0("\r", j, "/", nh))}
     if(has.S.params){sp <- S.params[j,]}
-    t.hat[j] <-  2*Ne*optimize(loglikelihood.age, interval=c(0,max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape, tol=tol)$maximum
+    this.max.search <- max.search
+    if(is.na(max.search)){this.max.search <- 10/haps$map.len[j]/2/Ne} #rough.guess
+    e <- tryCatch({
+        t.hat[j] <-  2*Ne*optimize(likelihood, interval=c(0,this.max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape, mu=mu, tol=tol)$maximum}
+             , error=function(e){e})
+
+    if(inherits(e, "error")){
+        error.count <- error.count+1
+        if(ignoreErrors){
+            t.hat[j] <- NA
+        }else{
+            stop(paste0("Caught error in MLE.from.haps j=", j, "\n", e))
+        }
+    }
   }
+  
+  if(verbose & error.count>0){cat(paste0("\rIgnored ", error.count, " errors\n"))}
   if(verbose){cat("\rDone\n")}
   return(t.hat)
 }
