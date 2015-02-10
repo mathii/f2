@@ -31,7 +31,7 @@ names(sim.pop.map) <- samples
 if(n.cores==1){
     haps <- find.haplotypes.from.f2(f1.file, f2.file, pos.file, by.sample.gt.root, sim.pop.map, map.file, verbose=verbose)
 }else{
-    require(multicore)
+    require(parallel)
     pos <- scan(pos.file, quiet=TRUE)
     pos <- range(pos)+c(-1e6, 1e6)
     breaks <- seq(pos[1], pos[2], length.out=n.cores+1)

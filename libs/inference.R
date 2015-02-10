@@ -347,22 +347,22 @@ MLE.from.haps <- function(haps, Ne, S.params=NA, error.params=NA, max.search=1, 
   sp <- NA
   error.count <- 0
   for(j in 1:nh){
-    if(verbose){cat(paste0("\r", j, "/", nh))}
-    if(has.S.params){sp <- S.params[j,]}
-    this.max.search <- max.search
-    if(is.na(max.search)){this.max.search <- 10/haps$map.len[j]/2/Ne} #rough.guess
-    e <- tryCatch({
-        t.hat[j] <-  2*Ne*optimize(likelihood, interval=c(0,this.max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape, mu=mu, tol=tol)$maximum}
-             , error=function(e){e})
+      if(verbose){cat(paste0("\r", j, "/", nh))}
+      if(has.S.params){sp <- S.params[j,]}
+      this.max.search <- max.search
+      if(is.na(max.search)){this.max.search <- 10/haps$map.len[j]/2/Ne} #rough.guess
+      e <- tryCatch({
+          t.hat[j] <-  2*Ne*optimize(likelihood, interval=c(0,this.max.search), maximum=TRUE,  Lg=haps$map.len[j],  Ne=Ne, pf=p.fun, D=haps$f2[j], error.params=error.params, S.params=sp, shape=shape, mu=mu, tol=tol)$maximum}
+                  , error=function(e){e})
 
-    if(inherits(e, "error")){
-        error.count <- error.count+1
-        if(ignoreErrors){
-            t.hat[j] <- NA
-        }else{
-            stop(paste0("Caught error in MLE.from.haps j=", j, "\n", e))
-        }
-    }
+      if(inherits(e, "error")){
+          error.count <- error.count+1
+          if(ignoreErrors){
+              t.hat[j] <- NA
+          }else{
+              stop(paste0("Caught error in MLE.from.haps j=", j, "\n", e))
+          }
+      }
   }
   
   if(verbose & error.count>0){cat(paste0("\rIgnored ", error.count, " errors\n"))}
