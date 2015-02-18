@@ -57,7 +57,7 @@ likelihood.profile.mu <- function(haps, Ne, mu.grid, error.params=NA,
         S.params$theta <- 4*Ne*mu
         S.params$Ep <- S.params$Lp*(theta.estimates[haps$ID1]+theta.estimates[haps$ID2])
 
-        t.hats <- MLE.from.haps(haps, Ne, S.params=S.params, error.params=error.params, verbose=TRUE, tol=tol, mu=hap.detect.rate, ignoreErrors=TRUE, v2=v2, shape=shape)
+        t.hats <- MLE.from.haps(haps, Ne, S.params=S.params, error.params=error.params, verbose=verbose, tol=tol, mu=hap.detect.rate, ignoreErrors=TRUE, v2=v2, shape=shape)
         med.t.hat[i] <- median(t.hats, na.rm=TRUE)
         for(j in 1:NROW(haps)){
             e <- tryCatch({
