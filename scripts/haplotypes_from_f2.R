@@ -5,7 +5,8 @@
 args <- commandArgs(TRUE)
 
 n.cores <- 1
-if(length(args)==5 | length(args)==6){
+f2.filename <- "/pos.idx.f2.gz"
+if((length(args) %in% c(5,6,7))){
   code.dir <- args[1]
   hap.root <- args[2]
   out.file <- args[3]
@@ -14,14 +15,19 @@ if(length(args)==5 | length(args)==6){
   if(length(args)==6){
       n.cores <- as.numeric(args[6])
   }
+    if(length(args)==7){
+      f2.filename <- args[7]
+  }
+
 } else{
-  stop("Need to specify 5 or 6 arguments")
+  stop("Need to specify 5 or 6 or 7 arguments")
 }
 
 source(paste(code.dir, "/libs/include.R", sep=""))
 
 f1.file <- paste(hap.root, "/pos.idx.f1.gz", sep="")
-f2.file <- paste(hap.root, "/pos.idx.f2.gz", sep="")
+f2.file <- paste(hap.root, f2.filename, sep="")
+
 pos.file <- paste(hap.root, "/by_sample/pos.gz", sep="")
 by.sample.gt.root <- paste(hap.root, "/by_sample", sep="")
 samples <- scan(paste(hap.root, "/samples.txt", sep=""), quiet=TRUE, what="")
