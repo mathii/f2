@@ -7,7 +7,8 @@
 
 args <- commandArgs(TRUE)
 
-if(length(args)==7){
+extra=""
+if(length(args) %in% c(7,8)){
   code.dir <- args[1]
   hap.root <- args[2]
   res.dir <- args[3]
@@ -15,14 +16,15 @@ if(length(args)==7){
   verbose <- as.numeric(args[5])
   n <- as.numeric(args[6])
   Ne <- as.numeric(args[7])
+  if(length(args)>7){extra=args[8]}
   
 } else{
-  stop("Need to specify 7 arguments")
+  stop("Need to specify 7 or 8 arguments")
 }
 
 source(paste(code.dir, "/libs/include.R", sep=""))
 
-fn.file <- paste0(hap.root, "/pos.idx.f", n, ".gz")
+fn.file <- paste0(hap.root, "/pos.idx.f", n, extra, ".gz")
 
 pos.file <- paste(hap.root, "/by_sample/pos.gz", sep="")
 by.sample.gt.root <- paste(hap.root, "/by_sample", sep="")
@@ -45,4 +47,4 @@ t.hats <- MLE.from.haps(haps, Ne, S.params=NA,  error.params=error.params, verbo
 
 haps <- cbind(haps, t.hat=t.hats)
 
-write.table(haps, paste0(res.dir, "/f", n, "_results.txt"), row.names=FALSE, col.names=TRUE, quote=FALSE)
+write.table(haps, paste0(res.dir, "/f", n, extra, "_results.txt"), row.names=FALSE, col.names=TRUE, quote=FALSE)
