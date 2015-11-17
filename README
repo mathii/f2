@@ -4,6 +4,11 @@ f2 variants, as described in "Demography and the age of rare variants"
 any means, but we provide the scripts for people to explore the results
 in the paper, or investigate their own datasets. 
 
+Warning:
+This code does not handle missing data well. If your data contains missing 
+genotypes you should apply a pre-processing step to the vcf where you either remove 
+rows with missing calls, or replace missing calls with majority calls.
+
 Requirements: 
 
 The code is written variously in C, R and python, and relies on various 

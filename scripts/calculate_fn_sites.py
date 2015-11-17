@@ -5,6 +5,7 @@
 
 from __future__ import division
 import gzip, numpy, sys, getopt
+import pdb
 
 REP_INT=1e3                     # Report every REP_INT lines
 
@@ -63,6 +64,7 @@ def main(options):
 
         minor=None
         gt=bits[1:]
+        pdb.set_trace()
         if not all([x=="1" or x=="0" for x in gt]): # any missing genotypes
             continue
 
